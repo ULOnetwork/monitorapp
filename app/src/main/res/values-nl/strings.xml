@@ -78,6 +78,7 @@
     <string name="settings_export_copied">Code gekopieerd naar klembord</string>
     <string name="settings_export_label">Exportcode</string>
     <string name="settings_export_hint">Kopieer deze tekst en plak \'m in het importveld op een ander apparaat</string>
+    <string name="settings_export_file_hint">Ook opgeslagen in de eigen opslag van de app als %1$s. Komt de klembordkopie niet aan op je computer (bijv. via scrcpy), haal \'m dan op met: adb shell run-as eu.ulonetwork.monitorapp cat files/%1$s</string>
     <string name="settings_import_label">Plak hier de code</string>
     <string name="settings_import_placeholder">UMJMAIL1:…</string>
     <string name="settings_import_button">Importeren</string>

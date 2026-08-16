@@ -133,6 +133,18 @@ eigen apparaten over te zetten zonder de API Key en Secret Key opnieuw over te t
 3. Tik daarna nog op **"Instellingen opslaan"** om de import te bevestigen — importeren vult alleen
    de velden, het slaat nog niet automatisch op.
 
+**Klembord werkt niet (bijv. bij beheer op afstand via scrcpy)?** De code wordt bij het genereren
+ook altijd weggeschreven naar de eigen (private) opslag van de app, als `mailjet-export.txt`. Haal
+'m op vanaf je computer met:
+
+```bash
+adb shell run-as eu.ulonetwork.monitorapp cat files/mailjet-export.txt
+```
+
+Dit werkt zonder opslagpermissies omdat het de interne, app-eigen opslag is (`run-as` kan hierbij
+omdat dit een debug-build is). Kopieer de output (inclusief het `UMJMAIL1:`-voorvoegsel) en plak
+'m op het andere apparaat.
+
 **Let op:** deze code bevat je API Key en Secret Key in decodeerbare vorm (base64), dus behandel
 'm als een wachtwoord — deel 'm niet via chat-apps of notities die naar derden gesynchroniseerd
 worden.

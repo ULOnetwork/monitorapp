@@ -78,6 +78,7 @@
     <string name="settings_export_copied">Code copied to clipboard</string>
     <string name="settings_export_label">Export code</string>
     <string name="settings_export_hint">Copy this text and paste it into the import field on another device</string>
+    <string name="settings_export_file_hint">Also saved to the app\'s private storage as %1$s. If clipboard copy doesn\'t reach your computer (e.g. over scrcpy), retrieve it with: adb shell run-as eu.ulonetwork.monitorapp cat files/%1$s</string>
     <string name="settings_import_label">Paste code here</string>
     <string name="settings_import_placeholder">UMJMAIL1:…</string>
     <string name="settings_import_button">Import</string>

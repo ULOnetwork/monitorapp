@@ -1,6 +1,8 @@
 package eu.ulonetwork.monitorapp.ui.screens
 
 import android.app.Activity
+import android.content.Context
+import android.util.Log
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -56,6 +58,25 @@ import kotlinx.coroutines.launch
  * `true` later to re-enable Dutch without any further rework.
  */
 private const val LANGUAGE_PICKER_ENABLED = false
+
+/**
+ * Name of the file the export code is also written to (app-private internal storage, via
+ * [Context.openFileOutput]). Clipboard sync doesn't always reach the host when the device is
+ * being driven remotely (e.g. over scrcpy), so this gives a fallback way to retrieve the code
+ * with `adb shell run-as eu.ulonetwork.monitorapp cat files/mailjet-export.txt` — no storage
+ * permission needed since it's the app's own private internal storage.
+ */
+private const val EXPORT_FILE_NAME = "mailjet-export.txt"
+
+private fun writeExportFile(context: Context, exportCode: String) {
+    try {
+        context.openFileOutput(EXPORT_FILE_NAME, Context.MODE_PRIVATE).use {
+            it.write(exportCode.toByteArray(Charsets.UTF_8))
+        }
+    } catch (e: Exception) {
+        Log.w("SettingsScreen", "Failed to write export file: ${e.message}", e)
+    }
+}
 
 @Composable
 fun SettingsScreen() {
@@ -197,6 +218,7 @@ fun SettingsScreen() {
                 onClick = {
                     exportCode = MailjetSettingsCodec.encode(currentSettings())
                     clipboardManager.setText(AnnotatedString(exportCode))
+                    writeExportFile(context, exportCode)
                     scope.launch { snackbarHostState.showSnackbar(context.getString(R.string.settings_export_copied)) }
                 },
                 modifier = Modifier.fillMaxWidth()
@@ -212,6 +234,11 @@ fun SettingsScreen() {
                     label = { Text(stringResource(R.string.settings_export_label)) },
                     supportingText = { Text(stringResource(R.string.settings_export_hint)) },
                     modifier = Modifier.fillMaxWidth()
+                )
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(
+                    text = stringResource(R.string.settings_export_file_hint, EXPORT_FILE_NAME),
+                    style = MaterialTheme.typography.bodySmall
                 )
             }
 
