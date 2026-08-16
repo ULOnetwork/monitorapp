@@ -84,9 +84,8 @@ dependencies {
     // Coroutines
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.1")
 
-    // SMTP email
-    implementation("com.sun.mail:android-mail:1.6.7")
-    implementation("com.sun.mail:android-activation:1.6.7")
+    // Mail is sent via the Mailjet REST API over HTTPS (HttpsURLConnection + org.json, both
+    // already part of the Android SDK) — no dedicated mail-sending dependency needed.
 
     // Notifications
     implementation("androidx.core:core:1.13.1")

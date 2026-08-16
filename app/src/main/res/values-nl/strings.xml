@@ -55,21 +55,21 @@
     <string name="log_channel_email">e-mail</string>
     <string name="log_channel_none">geen</string>
 
-    <string name="settings_title">E-mail instellingen (SMTP)</string>
-    <string name="settings_host">SMTP-server (host)</string>
-    <string name="settings_port">Poort</string>
-    <string name="settings_username">Gebruikersnaam</string>
-    <string name="settings_password">App-wachtwoord</string>
+    <string name="settings_title">E-mail instellingen (Mailjet)</string>
+    <string name="settings_explanation">E-mailmeldingen worden verstuurd via de Mailjet API over HTTPS (niet via SMTP), omdat SMTP-poorten vaak geblokkeerd worden door netwerkfirewalls. Zie de README voor het aanmaken van een Mailjet-account en waar je deze waarden vindt.</string>
+    <string name="settings_api_key">API Key</string>
+    <string name="settings_secret_key">Secret Key</string>
     <string name="settings_from">Afzenderadres</string>
+    <string name="settings_from_hint">Moet een geverifieerd afzenderadres/domein zijn in je Mailjet-account</string>
+    <string name="settings_from_name">Afzendernaam (optioneel)</string>
     <string name="settings_to">Ontvangeradres</string>
-    <string name="settings_use_tls">Gebruik TLS</string>
     <string name="settings_save">Instellingen opslaan</string>
     <string name="settings_test_email">Test e-mail versturen</string>
     <string name="settings_saved">Instellingen opgeslagen</string>
     <string name="settings_test_success">Test e-mail is verzonden</string>
     <string name="settings_test_failure">Versturen mislukt: %1$s</string>
     <string name="settings_test_email_subject">UnetworkMonitor testbericht</string>
-    <string name="settings_test_email_body">Dit is een test e-mail vanuit de UnetworkMonitor app. Als je dit ontvangt, werken de SMTP-instellingen correct.</string>
+    <string name="settings_test_email_body">Dit is een test e-mail vanuit de UnetworkMonitor app. Als je dit ontvangt, werken de Mailjet-instellingen correct.</string>
 
     <string name="settings_language_section">Language / Taal</string>
     <string name="language_option_english">English</string>

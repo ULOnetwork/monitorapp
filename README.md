@@ -74,42 +74,50 @@ handmatig doen:
 
 Op Android 12 en lager is deze aparte toestemming niet nodig; meldingen werken dan direct.
 
-## 5. SMTP-instellingen invullen (voor e-mailmeldingen)
+## 5. Mailjet-instellingen invullen (voor e-mailmeldingen)
+
+### Waarom Mailjet in plaats van SMTP?
+
+Deze app verstuurde e-mailmeldingen aanvankelijk via SMTP, maar op het doeltoestel blokkeert de
+netwerkfirewall uitgaand verkeer op de gangbare SMTP-poorten (25, 465, 587) — een veelvoorkomend
+firewallbeleid. Daardoor werkte SMTP nooit, ongeacht welke host/poort/TLS-instelling je invulde
+("Exception reading response" en vergelijkbare foutmeldingen). HTTPS (poort 443) is op dit
+toestel wél toegestaan (anders zou niets anders in de app werken), dus verstuurt UnetworkMonitor
+e-mail nu via de Mailjet Send API v3.1, een REST-API over gewoon HTTPS, in plaats van rechtstreeks
+via SMTP.
+
+### Mailjet-account voorbereiden
+
+1. Maak een gratis account aan op [mailjet.com](https://www.mailjet.com). Controleer op de
+   website zelf wat de actuele limieten van het gratis abonnement zijn (aantal e-mails per dag/
+   maand) — dat kan in de tussentijd gewijzigd zijn.
+2. **Verifieer het afzenderadres of -domein** dat je wilt gebruiken: ga naar
+   Account Settings > Sender domains & addresses en volg de verificatiestappen (meestal een
+   bevestigingsmail of een DNS-record, afhankelijk van of je een los adres of een heel domein
+   verifieert). **Belangrijk:** Mailjet weigert e-mail te versturen vanaf een niet-geverifieerd
+   afzenderadres, dus doe dit vóórdat je de testknop in de app gebruikt, anders krijg je een
+   foutmelding die niets met de app zelf te maken heeft.
+3. Ga naar Account Settings > REST API > API Key Management om je **API Key** en **Secret Key**
+   te vinden (of een nieuwe sleutel aan te maken).
+
+### Instellingen invullen in de app
 
 Ga naar het tabblad "E-mail instellingen" en vul de volgende velden in:
 
 | Veld | Omschrijving |
 |---|---|
-| SMTP-server (host) | Bijvoorbeeld `smtp.gmail.com` |
-| Poort | Bijvoorbeeld `587` (TLS) |
-| Gebruikersnaam | Je volledige e-mailadres |
-| App-wachtwoord | Zie hieronder — gebruik nooit je normale wachtwoord |
-| Afzenderadres | Meestal hetzelfde als de gebruikersnaam |
+| API Key | Uit Mailjet: Account Settings > REST API > API Key Management |
+| Secret Key | Idem — behandel dit als een wachtwoord |
+| Afzenderadres | Het geverifieerde adres uit stap 2 hierboven |
+| Afzendernaam (optioneel) | Bijvoorbeeld "UnetworkMonitor" — mag leeg blijven |
 | Ontvangeradres | Het e-mailadres waar de meldingen naartoe moeten |
-| Gebruik TLS | Aan laten staan voor de meeste providers (incl. Gmail op poort 587) |
 
 Tik op "Instellingen opslaan" en gebruik daarna "Test e-mail versturen" om te controleren of alles
-correct is ingesteld. Het resultaat (gelukt/mislukt) verschijnt onderaan het scherm.
+correct is ingesteld. Het resultaat (gelukt/mislukt, inclusief de foutmelding van Mailjet zelf bij
+een fout) verschijnt onderaan het scherm.
 
-### Voorbeeld: Gmail-App-wachtwoord aanmaken
-
-Gmail staat vanwege beveiliging niet toe om je gewone accountwachtwoord te gebruiken voor apps als
-deze. In plaats daarvan maak je een "App-wachtwoord" aan:
-
-1. Zorg dat tweestapsverificatie is ingeschakeld op je Google-account
-   (myaccount.google.com > Beveiliging > Tweestapsverificatie).
-2. Ga naar myaccount.google.com > Beveiliging > App-wachtwoorden
-   (rechtstreekse link: https://myaccount.google.com/apppasswords).
-3. Kies een naam voor de app-wachtwoord, bijvoorbeeld "UnetworkMonitor", en klik op "Aanmaken".
-4. Google toont een wachtwoord van 16 tekens (zonder spaties bij het invullen). Kopieer dit.
-5. Vul in UnetworkMonitor bij "SMTP-server" `smtp.gmail.com` in, poort `587`, TLS aan,
-   "Gebruikersnaam" is je volledige Gmail-adres, en "App-wachtwoord" is het gekopieerde
-   wachtwoord van stap 4.
-6. Afzenderadres en ontvangeradres kun je beide op je eigen Gmail-adres zetten (of een ander
-   ontvangeradres naar keuze).
-
-De SMTP-gegevens worden op het toestel opgeslagen met `EncryptedSharedPreferences`, dus
-versleuteld en nooit in platte tekst.
+De Mailjet API Key en Secret Key worden op het toestel opgeslagen met `EncryptedSharedPreferences`,
+dus versleuteld en nooit in platte tekst.
 
 ## 6. Taal van de app
 
@@ -134,7 +142,8 @@ herbouwwerkzaamheden.
   trefwoord zonder jokertekens werkt zoals voorheen als gewone tekstovereenkomst.
 - **Meldingenlog**: chronologisch overzicht van alle gevonden trefwoorden, met tijdstip, app en
   tekstfragment.
-- **E-mail instellingen**: SMTP-configuratie met testknop.
+- **E-mail instellingen**: Mailjet-configuratie (API Key/Secret Key, afzender, ontvanger) met
+  testknop. E-mail wordt verstuurd via HTTPS naar de Mailjet Send API, niet via SMTP.
 
 ## Herbouwen na wijzigingen
 

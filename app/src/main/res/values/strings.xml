@@ -55,21 +55,21 @@
     <string name="log_channel_email">e-mail</string>
     <string name="log_channel_none">none</string>
 
-    <string name="settings_title">E-mail settings (SMTP)</string>
-    <string name="settings_host">SMTP server (host)</string>
-    <string name="settings_port">Port</string>
-    <string name="settings_username">Username</string>
-    <string name="settings_password">App password</string>
+    <string name="settings_title">E-mail settings (Mailjet)</string>
+    <string name="settings_explanation">E-mail alerts are sent via the Mailjet API over HTTPS (not SMTP), since SMTP ports are commonly blocked by network firewalls. See the README for how to create a Mailjet account and find these values.</string>
+    <string name="settings_api_key">API Key</string>
+    <string name="settings_secret_key">Secret Key</string>
     <string name="settings_from">Sender address</string>
+    <string name="settings_from_hint">Must be a verified sender address/domain in your Mailjet account</string>
+    <string name="settings_from_name">Sender name (optional)</string>
     <string name="settings_to">Recipient address</string>
-    <string name="settings_use_tls">Use TLS</string>
     <string name="settings_save">Save settings</string>
     <string name="settings_test_email">Send test e-mail</string>
     <string name="settings_saved">Settings saved</string>
     <string name="settings_test_success">Test e-mail was sent</string>
     <string name="settings_test_failure">Sending failed: %1$s</string>
     <string name="settings_test_email_subject">UnetworkMonitor test message</string>
-    <string name="settings_test_email_body">This is a test e-mail from the UnetworkMonitor app. If you receive this, your SMTP settings are working correctly.</string>
+    <string name="settings_test_email_body">This is a test e-mail from the UnetworkMonitor app. If you receive this, your Mailjet settings are working correctly.</string>
 
     <string name="settings_language_section">Language / Taal</string>
     <string name="language_option_english">English</string>

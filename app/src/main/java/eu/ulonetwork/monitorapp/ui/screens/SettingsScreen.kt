@@ -23,7 +23,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
@@ -42,9 +41,9 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.core.os.LocaleListCompat
 import eu.ulonetwork.monitorapp.R
+import eu.ulonetwork.monitorapp.data.MailjetSettings
 import eu.ulonetwork.monitorapp.data.PreferencesManager
-import eu.ulonetwork.monitorapp.data.SmtpSettings
-import eu.ulonetwork.monitorapp.mail.SmtpMailSender
+import eu.ulonetwork.monitorapp.mail.MailjetMailSender
 import kotlinx.coroutines.launch
 
 /**
@@ -59,38 +58,32 @@ private const val LANGUAGE_PICKER_ENABLED = false
 fun SettingsScreen() {
     val context = LocalContext.current
     val preferencesManager = remember { PreferencesManager(context) }
-    val mailSender = remember { SmtpMailSender() }
+    val mailSender = remember { MailjetMailSender() }
     val scope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
 
-    var host by remember { mutableStateOf("") }
-    var port by remember { mutableStateOf("587") }
-    var username by remember { mutableStateOf("") }
-    var password by remember { mutableStateOf("") }
+    var apiKey by remember { mutableStateOf("") }
+    var secretKey by remember { mutableStateOf("") }
     var fromAddress by remember { mutableStateOf("") }
+    var fromName by remember { mutableStateOf("") }
     var toAddress by remember { mutableStateOf("") }
-    var useTls by remember { mutableStateOf(true) }
     var isSendingTest by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
-        val settings = preferencesManager.getSmtpSettings()
-        host = settings.host
-        port = settings.port.toString()
-        username = settings.username
-        password = settings.password
+        val settings = preferencesManager.getMailjetSettings()
+        apiKey = settings.apiKey
+        secretKey = settings.secretKey
         fromAddress = settings.fromAddress
+        fromName = settings.fromName
         toAddress = settings.toAddress
-        useTls = settings.useTls
     }
 
-    fun currentSettings(): SmtpSettings = SmtpSettings(
-        host = host.trim(),
-        port = port.toIntOrNull() ?: 587,
-        username = username.trim(),
-        password = password,
+    fun currentSettings(): MailjetSettings = MailjetSettings(
+        apiKey = apiKey.trim(),
+        secretKey = secretKey.trim(),
         fromAddress = fromAddress.trim(),
-        toAddress = toAddress.trim(),
-        useTls = useTls
+        fromName = fromName.trim(),
+        toAddress = toAddress.trim()
     )
 
     Scaffold(
@@ -104,34 +97,21 @@ fun SettingsScreen() {
                 .padding(16.dp)
         ) {
             Text(text = stringResource(R.string.settings_title), style = MaterialTheme.typography.headlineSmall)
+            Spacer(modifier = Modifier.height(4.dp))
+            Text(text = stringResource(R.string.settings_explanation), style = MaterialTheme.typography.bodySmall)
             Spacer(modifier = Modifier.height(16.dp))
 
             OutlinedTextField(
-                value = host,
-                onValueChange = { host = it },
-                label = { Text(stringResource(R.string.settings_host)) },
+                value = apiKey,
+                onValueChange = { apiKey = it },
+                label = { Text(stringResource(R.string.settings_api_key)) },
                 modifier = Modifier.fillMaxWidth()
             )
             Spacer(modifier = Modifier.height(12.dp))
             OutlinedTextField(
-                value = port,
-                onValueChange = { port = it.filter { c -> c.isDigit() } },
-                label = { Text(stringResource(R.string.settings_port)) },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                modifier = Modifier.fillMaxWidth()
-            )
-            Spacer(modifier = Modifier.height(12.dp))
-            OutlinedTextField(
-                value = username,
-                onValueChange = { username = it },
-                label = { Text(stringResource(R.string.settings_username)) },
-                modifier = Modifier.fillMaxWidth()
-            )
-            Spacer(modifier = Modifier.height(12.dp))
-            OutlinedTextField(
-                value = password,
-                onValueChange = { password = it },
-                label = { Text(stringResource(R.string.settings_password)) },
+                value = secretKey,
+                onValueChange = { secretKey = it },
+                label = { Text(stringResource(R.string.settings_secret_key)) },
                 visualTransformation = PasswordVisualTransformation(),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
                 modifier = Modifier.fillMaxWidth()
@@ -141,7 +121,15 @@ fun SettingsScreen() {
                 value = fromAddress,
                 onValueChange = { fromAddress = it },
                 label = { Text(stringResource(R.string.settings_from)) },
+                supportingText = { Text(stringResource(R.string.settings_from_hint)) },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+                modifier = Modifier.fillMaxWidth()
+            )
+            Spacer(modifier = Modifier.height(12.dp))
+            OutlinedTextField(
+                value = fromName,
+                onValueChange = { fromName = it },
+                label = { Text(stringResource(R.string.settings_from_name)) },
                 modifier = Modifier.fillMaxWidth()
             )
             Spacer(modifier = Modifier.height(12.dp))
@@ -153,20 +141,10 @@ fun SettingsScreen() {
                 modifier = Modifier.fillMaxWidth()
             )
 
-            Spacer(modifier = Modifier.height(12.dp))
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(text = stringResource(R.string.settings_use_tls))
-                Switch(checked = useTls, onCheckedChange = { useTls = it })
-            }
-
             Spacer(modifier = Modifier.height(24.dp))
             Button(
                 onClick = {
-                    preferencesManager.saveSmtpSettings(currentSettings())
+                    preferencesManager.saveMailjetSettings(currentSettings())
                     scope.launch { snackbarHostState.showSnackbar(context.getString(R.string.settings_saved)) }
                 },
                 modifier = Modifier.fillMaxWidth()
@@ -177,7 +155,7 @@ fun SettingsScreen() {
             Spacer(modifier = Modifier.height(12.dp))
             OutlinedButton(
                 onClick = {
-                    preferencesManager.saveSmtpSettings(currentSettings())
+                    preferencesManager.saveMailjetSettings(currentSettings())
                     isSendingTest = true
                     scope.launch {
                         val result = mailSender.send(
@@ -187,8 +165,8 @@ fun SettingsScreen() {
                         )
                         isSendingTest = false
                         val message = when (result) {
-                            is SmtpMailSender.Result.Success -> context.getString(R.string.settings_test_success)
-                            is SmtpMailSender.Result.Failure -> context.getString(R.string.settings_test_failure, result.message)
+                            is MailjetMailSender.Result.Success -> context.getString(R.string.settings_test_success)
+                            is MailjetMailSender.Result.Failure -> context.getString(R.string.settings_test_failure, result.message)
                         }
                         snackbarHostState.showSnackbar(message)
                     }

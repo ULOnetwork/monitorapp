@@ -7,8 +7,8 @@ import androidx.security.crypto.MasterKey
 
 /**
  * Manages small app-level preferences: the one-time consent acknowledgement (plain
- * SharedPreferences, no sensitive data) and the SMTP settings (EncryptedSharedPreferences,
- * since these contain credentials).
+ * SharedPreferences, no sensitive data) and the Mailjet settings (EncryptedSharedPreferences,
+ * since the API Key / Secret Key are credentials).
  */
 class PreferencesManager(context: Context) {
 
@@ -39,29 +39,25 @@ class PreferencesManager(context: Context) {
         plainPrefs.edit().putBoolean(KEY_CONSENT_ACCEPTED, true).apply()
     }
 
-    // --- SMTP settings ---
+    // --- Mailjet settings ---
 
-    fun getSmtpSettings(): SmtpSettings {
-        return SmtpSettings(
-            host = encryptedPrefs.getString(KEY_SMTP_HOST, "") ?: "",
-            port = encryptedPrefs.getInt(KEY_SMTP_PORT, 587),
-            username = encryptedPrefs.getString(KEY_SMTP_USERNAME, "") ?: "",
-            password = encryptedPrefs.getString(KEY_SMTP_PASSWORD, "") ?: "",
-            fromAddress = encryptedPrefs.getString(KEY_SMTP_FROM, "") ?: "",
-            toAddress = encryptedPrefs.getString(KEY_SMTP_TO, "") ?: "",
-            useTls = encryptedPrefs.getBoolean(KEY_SMTP_USE_TLS, true)
+    fun getMailjetSettings(): MailjetSettings {
+        return MailjetSettings(
+            apiKey = encryptedPrefs.getString(KEY_MAILJET_API_KEY, "") ?: "",
+            secretKey = encryptedPrefs.getString(KEY_MAILJET_SECRET_KEY, "") ?: "",
+            fromAddress = encryptedPrefs.getString(KEY_MAILJET_FROM_ADDRESS, "") ?: "",
+            fromName = encryptedPrefs.getString(KEY_MAILJET_FROM_NAME, "") ?: "",
+            toAddress = encryptedPrefs.getString(KEY_MAILJET_TO_ADDRESS, "") ?: ""
         )
     }
 
-    fun saveSmtpSettings(settings: SmtpSettings) {
+    fun saveMailjetSettings(settings: MailjetSettings) {
         encryptedPrefs.edit()
-            .putString(KEY_SMTP_HOST, settings.host)
-            .putInt(KEY_SMTP_PORT, settings.port)
-            .putString(KEY_SMTP_USERNAME, settings.username)
-            .putString(KEY_SMTP_PASSWORD, settings.password)
-            .putString(KEY_SMTP_FROM, settings.fromAddress)
-            .putString(KEY_SMTP_TO, settings.toAddress)
-            .putBoolean(KEY_SMTP_USE_TLS, settings.useTls)
+            .putString(KEY_MAILJET_API_KEY, settings.apiKey)
+            .putString(KEY_MAILJET_SECRET_KEY, settings.secretKey)
+            .putString(KEY_MAILJET_FROM_ADDRESS, settings.fromAddress)
+            .putString(KEY_MAILJET_FROM_NAME, settings.fromName)
+            .putString(KEY_MAILJET_TO_ADDRESS, settings.toAddress)
             .apply()
     }
 
@@ -71,12 +67,10 @@ class PreferencesManager(context: Context) {
 
         private const val KEY_CONSENT_ACCEPTED = "consent_accepted"
 
-        private const val KEY_SMTP_HOST = "smtp_host"
-        private const val KEY_SMTP_PORT = "smtp_port"
-        private const val KEY_SMTP_USERNAME = "smtp_username"
-        private const val KEY_SMTP_PASSWORD = "smtp_password"
-        private const val KEY_SMTP_FROM = "smtp_from"
-        private const val KEY_SMTP_TO = "smtp_to"
-        private const val KEY_SMTP_USE_TLS = "smtp_use_tls"
+        private const val KEY_MAILJET_API_KEY = "mailjet_api_key"
+        private const val KEY_MAILJET_SECRET_KEY = "mailjet_secret_key"
+        private const val KEY_MAILJET_FROM_ADDRESS = "mailjet_from_address"
+        private const val KEY_MAILJET_FROM_NAME = "mailjet_from_name"
+        private const val KEY_MAILJET_TO_ADDRESS = "mailjet_to_address"
     }
 }

@@ -7,7 +7,7 @@ import eu.ulonetwork.monitorapp.data.db.AlertLogEntry
 import eu.ulonetwork.monitorapp.data.db.AppDatabase
 import eu.ulonetwork.monitorapp.data.db.KeywordRule
 import eu.ulonetwork.monitorapp.data.db.MatchMode
-import eu.ulonetwork.monitorapp.mail.SmtpMailSender
+import eu.ulonetwork.monitorapp.mail.MailjetMailSender
 import eu.ulonetwork.monitorapp.util.NotificationHelper
 import eu.ulonetwork.monitorapp.util.buildKeywordRegex
 import kotlinx.coroutines.Dispatchers
@@ -25,7 +25,7 @@ class RuleEvaluator(private val context: Context) {
 
     private val database = AppDatabase.getInstance(context)
     private val preferencesManager = PreferencesManager(context)
-    private val mailSender = SmtpMailSender()
+    private val mailSender = MailjetMailSender()
 
     /**
      * Evaluates all enabled rules against [screenText] observed while [appPackage] is in the
@@ -87,14 +87,14 @@ class RuleEvaluator(private val context: Context) {
         }
 
         if (rule.notifyEmail) {
-            val settings = preferencesManager.getSmtpSettings()
+            val settings = preferencesManager.getMailjetSettings()
             val result = mailSender.send(
                 settings = settings,
                 subject = context.getString(R.string.alert_email_subject, rule.keyword),
                 body = buildEmailBody(rule, appPackage, snippet, now)
             )
-            notifiedEmail = result is SmtpMailSender.Result.Success
-            if (result is SmtpMailSender.Result.Failure) {
+            notifiedEmail = result is MailjetMailSender.Result.Success
+            if (result is MailjetMailSender.Result.Failure) {
                 Log.w(TAG, "E-mail alert failed for rule ${rule.id}: ${result.message}")
             }
         }
