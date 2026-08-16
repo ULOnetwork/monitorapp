@@ -7,6 +7,7 @@ import kotlinx.coroutines.withContext
 import java.util.Properties
 import javax.mail.Authenticator
 import javax.mail.Message
+import javax.mail.MessagingException
 import javax.mail.PasswordAuthentication
 import javax.mail.Session
 import javax.mail.Transport
@@ -57,7 +58,7 @@ class SmtpMailSender {
                 Transport.send(message)
                 Result.Success
             } catch (e: Exception) {
-                val diagnostic = "${e.javaClass.simpleName}: ${e.message ?: "no further details"}"
+                val diagnostic = describeChain(e)
                 Log.e(TAG, "Failed to send e-mail: $diagnostic", e)
                 Result.Failure(diagnostic)
             }
@@ -97,6 +98,27 @@ class SmtpMailSender {
             put("mail.smtp.timeout", READ_TIMEOUT_MS)
             put("mail.smtp.writetimeout", WRITE_TIMEOUT_MS)
         }
+    }
+
+    /**
+     * The top-level `MessagingException` message alone (e.g. "Exception reading response") is
+     * usually just a generic wrapper — the actually useful diagnostic (SSL handshake failure,
+     * connection reset, auth rejected, unknown host, ...) is in the wrapped/nested exception.
+     * Walk both the standard [Throwable.cause] chain and JavaMail's own
+     * [MessagingException.getNextException] chaining (older JavaMail versions don't always mirror
+     * one into the other) and report every distinct exception in the chain.
+     */
+    private fun describeChain(root: Throwable): String {
+        val parts = mutableListOf<String>()
+        val seen = mutableSetOf<Throwable>()
+        var current: Throwable? = root
+        while (current != null && seen.add(current)) {
+            val throwable = current
+            parts += "${throwable.javaClass.simpleName}: ${throwable.message ?: "no further details"}"
+            val next = (throwable as? MessagingException)?.nextException?.takeIf { it !== throwable.cause }
+            current = next ?: throwable.cause
+        }
+        return parts.joinToString(separator = " -> caused by ")
     }
 
     companion object {
