@@ -149,7 +149,25 @@ omdat dit een debug-build is). Kopieer de output (inclusief het `UMJMAIL1:`-voor
 'm als een wachtwoord — deel 'm niet via chat-apps of notities die naar derden gesynchroniseerd
 worden.
 
-## 6. Taal van de app
+## 6. Trefwoordregels overzetten naar een ander apparaat
+
+Onderaan het "Trefwoorden"-scherm staat dezelfde export/import-functionaliteit als bij de
+Mailjet-instellingen, maar dan voor de hele lijst met trefwoordregels:
+
+1. Tik op **"Genereer code (kopieert naar klembord)"**. Dit zet een code met het voorvoegsel
+   `UMRULES1:` op het klembord, toont 'm ook in een tekstveld, en schrijft 'm weg naar de
+   app-eigen opslag als `keyword-rules-export.txt` (zelfde klembord-fallback als bij de
+   Mailjet-code, op te halen met
+   `adb shell run-as eu.ulonetwork.monitorapp cat files/keyword-rules-export.txt`).
+2. Plak de code op het andere apparaat in het importveld onderaan het "Trefwoorden"-scherm en tik
+   op **"Importeren"**.
+
+**Belangrijk verschil met de e-mailinstellingen:** importeren van regels **voegt ze toe** als
+nieuwe regels — het overschrijft of verwijdert nooit bestaande regels op het ontvangende apparaat.
+Dezelfde code twee keer importeren levert dus duplicaten op; verwijder die in dat geval handmatig
+in de lijst.
+
+## 7. Taal van de app
 
 De app toont voorlopig altijd **Engels**, ongeacht de systeemtaal van het toestel. Er is voor nu
 geen taalkeuze zichtbaar in de app. Onder de motorkap zijn de Nederlandse vertalingen en de
@@ -169,7 +187,11 @@ herbouwwerkzaamheden.
   afkoelperiode in minuten. "Bevat NIET"-regels vereisen een specifiek app-pakket. Een trefwoord
   mag eenvoudige jokertekens bevatten: `*` voor een willekeurige reeks tekens (ook geen) en `?`
   voor precies één teken — bijvoorbeeld `koop*bitcoin` vindt ook "koop nu snel bitcoin". Een
-  trefwoord zonder jokertekens werkt zoals voorheen als gewone tekstovereenkomst.
+  trefwoord zonder jokertekens werkt zoals voorheen als gewone tekstovereenkomst. Wildcards matchen
+  ook over regeleinden heen, zodat een patroon als `Attestation*Hardware-verified` ook matcht als
+  de twee delen als aparte tekstelementen op het scherm staan. De hele lijst met regels kan via een
+  kopieerbare code worden overgezet naar andere apparaten (regels worden bij import toegevoegd, niet
+  overschreven).
 - **Meldingenlog**: chronologisch overzicht van alle gevonden trefwoorden, met tijdstip, app en
   tekstfragment.
 - **E-mail instellingen**: Mailjet-configuratie (API Key/Secret Key, afzender, ontvanger) met

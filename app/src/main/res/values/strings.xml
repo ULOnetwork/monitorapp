@@ -24,6 +24,12 @@
 
     <string name="rules_title">Keywords</string>
     <string name="rules_empty">No keywords configured yet. Tap + to add one.</string>
+
+    <string name="rules_transfer_title">Transfer rules between devices</string>
+    <string name="rules_transfer_explanation">Generate a code below to copy all keyword rules to another device, or paste a code generated on another device to import them here. Importing adds the rules as new entries — it never overwrites or removes existing rules, so importing the same code twice creates duplicates.</string>
+    <string name="rules_export_button">Generate code (copies to clipboard)</string>
+    <string name="rules_import_placeholder">UMRULES1:…</string>
+    <string name="rules_import_success">%1$d rule(s) imported — review them in the list above</string>
     <string name="rule_add">Add keyword</string>
     <string name="rule_edit">Edit keyword</string>
     <string name="rule_keyword">Keyword</string>

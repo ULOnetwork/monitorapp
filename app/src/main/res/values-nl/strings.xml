@@ -24,6 +24,12 @@
 
     <string name="rules_title">Trefwoorden</string>
     <string name="rules_empty">Nog geen trefwoorden ingesteld. Tik op + om er een toe te voegen.</string>
+
+    <string name="rules_transfer_title">Regels overzetten tussen apparaten</string>
+    <string name="rules_transfer_explanation">Genereer hieronder een code om alle trefwoordregels naar een ander apparaat te kopiëren, of plak een code die op een ander apparaat is gegenereerd om ze hier te importeren. Importeren voegt de regels toe als nieuwe items — het overschrijft of verwijdert nooit bestaande regels, dus dezelfde code twee keer importeren geeft duplicaten.</string>
+    <string name="rules_export_button">Genereer code (kopieert naar klembord)</string>
+    <string name="rules_import_placeholder">UMRULES1:…</string>
+    <string name="rules_import_success">%1$d regel(s) geïmporteerd — bekijk ze in de lijst hierboven</string>
     <string name="rule_add">Trefwoord toevoegen</string>
     <string name="rule_edit">Trefwoord bewerken</string>
     <string name="rule_keyword">Trefwoord</string>
