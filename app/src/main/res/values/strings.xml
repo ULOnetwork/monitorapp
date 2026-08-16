@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">UnetworkMonitor</string>
+    <string name="accessibility_service_description">UnetworkMonitor reads the text visible on screen to compare it against a list of self-configured keywords. No text is stored or transmitted, except for a short excerpt around a matched keyword in this app\'s own alert log.</string>
+
+    <string name="nav_status">Status</string>
+    <string name="nav_rules">Keywords</string>
+    <string name="nav_log">Alert log</string>
+    <string name="nav_settings">E-mail settings</string>
+
+    <string name="consent_title">Before you continue</string>
+    <string name="consent_body">UnetworkMonitor uses an Accessibility Service to read the text visible on screen, across all apps used on this device. This text is compared against a list of keywords that you configure yourself. On a match, the app can show a local notification and/or send an e-mail.\n\nOnly install and use this app on a device that you own yourself, or for which you have the explicit permission of the owner/user to monitor it. Reading screen text without the consent of the device\'s user may be in violation of privacy laws and regulations.\n\nThe app is always visible in the app list with its normal icon and normal name \"UnetworkMonitor\", and never hides itself.</string>
+    <string name="consent_agree">I agree</string>
+
+    <string name="status_title">Status</string>
+    <string name="status_explanation">UnetworkMonitor checks the text on your screen against self-configured keywords and warns you via a notification and/or e-mail when a keyword is found. This requires the Accessibility Service, plus permission to show notifications.</string>
+    <string name="status_service_enabled">Accessibility Service is enabled</string>
+    <string name="status_service_disabled">Accessibility Service is not enabled</string>
+    <string name="status_open_accessibility_settings">Open accessibility settings</string>
+    <string name="status_accessibility_hint">Android does not allow apps to grant this permission themselves. Enable \"UnetworkMonitor\" manually in Settings &gt; Accessibility.</string>
+    <string name="status_notifications_granted">Notifications are allowed</string>
+    <string name="status_notifications_denied">Notifications are not allowed</string>
+    <string name="status_request_notifications">Allow notifications</string>
+
+    <string name="rules_title">Keywords</string>
+    <string name="rules_empty">No keywords configured yet. Tap + to add one.</string>
+    <string name="rule_add">Add keyword</string>
+    <string name="rule_edit">Edit keyword</string>
+    <string name="rule_keyword">Keyword</string>
+    <string name="rule_keyword_hint">Use * to match any characters, ? to match a single character</string>
+    <string name="rule_match_mode">Match mode</string>
+    <string name="rule_match_contains">Contains keyword</string>
+    <string name="rule_match_not_contains">Does NOT contain keyword</string>
+    <string name="rule_case_sensitive">Case sensitive</string>
+    <string name="rule_enabled">Enabled</string>
+    <string name="rule_notify_local">Local notification</string>
+    <string name="rule_notify_email">E-mail notification</string>
+    <string name="rule_app_filter">App package filter (optional)</string>
+    <string name="rule_app_filter_hint">e.g. com.whatsapp — empty = all apps</string>
+    <string name="rule_cooldown">Cooldown period (minutes)</string>
+    <string name="rule_not_contains_requires_app">\"Does NOT contain\" rules require a specific app package, otherwise every other screen would match incorrectly.</string>
+    <string name="rule_save">Save</string>
+    <string name="rule_delete">Delete</string>
+    <string name="rule_cancel">Cancel</string>
+    <string name="rule_row_all_apps">all apps</string>
+    <string name="rule_row_status_active">active</string>
+    <string name="rule_row_status_disabled">disabled</string>
+    <string name="rule_row_summary">%1$s • %2$s • %3$s</string>
+
+    <string name="log_title">Alert log</string>
+    <string name="log_empty">No alerts yet.</string>
+    <string name="log_entry_title">\"%1$s\" — %2$s</string>
+    <string name="log_channels_label">Channels: %1$s</string>
+    <string name="log_channel_notification">notification</string>
+    <string name="log_channel_email">e-mail</string>
+    <string name="log_channel_none">none</string>
+
+    <string name="settings_title">E-mail settings (SMTP)</string>
+    <string name="settings_host">SMTP server (host)</string>
+    <string name="settings_port">Port</string>
+    <string name="settings_username">Username</string>
+    <string name="settings_password">App password</string>
+    <string name="settings_from">Sender address</string>
+    <string name="settings_to">Recipient address</string>
+    <string name="settings_use_tls">Use TLS</string>
+    <string name="settings_save">Save settings</string>
+    <string name="settings_test_email">Send test e-mail</string>
+    <string name="settings_saved">Settings saved</string>
+    <string name="settings_test_success">Test e-mail was sent</string>
+    <string name="settings_test_failure">Sending failed: %1$s</string>
+    <string name="settings_test_email_subject">UnetworkMonitor test message</string>
+    <string name="settings_test_email_body">This is a test e-mail from the UnetworkMonitor app. If you receive this, your SMTP settings are working correctly.</string>
+
+    <string name="settings_language_section">Language / Taal</string>
+    <string name="language_option_english">English</string>
+    <string name="language_option_dutch">Nederlands</string>
+
+    <string name="notification_channel_name">Keyword alerts</string>
+    <string name="notification_channel_description">Alerts when a configured keyword is found on screen</string>
+    <string name="notification_title">Keyword found: %1$s</string>
+    <string name="notification_text">App: %1$s — %2$s</string>
+
+    <string name="alert_email_subject">UnetworkMonitor: keyword \"%1$s\" found</string>
+    <string name="alert_email_intro">UnetworkMonitor found a keyword.</string>
+    <string name="alert_email_keyword_label">Keyword: %1$s</string>
+    <string name="alert_email_app_label">App: %1$s</string>
+    <string name="alert_email_time_label">Time: %1$s</string>
+    <string name="alert_email_fragment_label">Fragment:</string>
+</resources>

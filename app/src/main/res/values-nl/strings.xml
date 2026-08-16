@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">UnetworkMonitor</string>
+    <string name="accessibility_service_description">UnetworkMonitor leest de tekst die zichtbaar is op het scherm om deze te vergelijken met een lijst met zelf ingestelde trefwoorden. Er wordt geen tekst opgeslagen of verzonden, behalve een kort fragment rond een gevonden trefwoord in het meldingenlogboek van deze app.</string>
+
+    <string name="nav_status">Status</string>
+    <string name="nav_rules">Trefwoorden</string>
+    <string name="nav_log">Meldingenlog</string>
+    <string name="nav_settings">E-mail instellingen</string>
+
+    <string name="consent_title">Voordat je verdergaat</string>
+    <string name="consent_body">UnetworkMonitor gebruikt een Toegankelijkheidsservice (Accessibility Service) om de tekst te lezen die zichtbaar is op het scherm, in alle apps die op dit apparaat worden gebruikt. Deze tekst wordt vergeleken met een lijst trefwoorden die jij zelf instelt. Bij een match kan de app een lokale melding tonen en/of een e-mail versturen.\n\nInstalleer en gebruik deze app alleen op een apparaat dat je zelf bezit, of waarvoor je uitdrukkelijke toestemming hebt van de eigenaar/gebruiker om het te monitoren. Het lezen van schermtekst zonder toestemming van de gebruiker van het apparaat kan in strijd zijn met wet- en regelgeving rond privacy.\n\nDe app is altijd zichtbaar in de app-lijst met het normale icoon en de normale naam \"UnetworkMonitor\" en verbergt zichzelf nooit.</string>
+    <string name="consent_agree">Ik ga akkoord</string>
+
+    <string name="status_title">Status</string>
+    <string name="status_explanation">UnetworkMonitor controleert de tekst op je scherm op zelf ingestelde trefwoorden en waarschuwt je via een melding en/of e-mail wanneer een trefwoord wordt gevonden. Hiervoor is de Toegankelijkheidsservice nodig, plus toestemming om meldingen te tonen.</string>
+    <string name="status_service_enabled">Toegankelijkheidsservice is ingeschakeld</string>
+    <string name="status_service_disabled">Toegankelijkheidsservice is niet ingeschakeld</string>
+    <string name="status_open_accessibility_settings">Open toegankelijkheidsinstellingen</string>
+    <string name="status_accessibility_hint">Android staat apps niet toe om deze permissie zelf te verlenen. Schakel \"UnetworkMonitor\" handmatig in bij Instellingen &gt; Toegankelijkheid.</string>
+    <string name="status_notifications_granted">Meldingen zijn toegestaan</string>
+    <string name="status_notifications_denied">Meldingen zijn niet toegestaan</string>
+    <string name="status_request_notifications">Meldingen toestaan</string>
+
+    <string name="rules_title">Trefwoorden</string>
+    <string name="rules_empty">Nog geen trefwoorden ingesteld. Tik op + om er een toe te voegen.</string>
+    <string name="rule_add">Trefwoord toevoegen</string>
+    <string name="rule_edit">Trefwoord bewerken</string>
+    <string name="rule_keyword">Trefwoord</string>
+    <string name="rule_keyword_hint">Gebruik * voor een willekeurige reeks tekens, ? voor precies één teken</string>
+    <string name="rule_match_mode">Overeenkomstmodus</string>
+    <string name="rule_match_contains">Bevat trefwoord</string>
+    <string name="rule_match_not_contains">Bevat trefwoord NIET</string>
+    <string name="rule_case_sensitive">Hoofdlettergevoelig</string>
+    <string name="rule_enabled">Ingeschakeld</string>
+    <string name="rule_notify_local">Lokale melding</string>
+    <string name="rule_notify_email">E-mail melding</string>
+    <string name="rule_app_filter">App-pakket filter (optioneel)</string>
+    <string name="rule_app_filter_hint">bijv. com.whatsapp — leeg = alle apps</string>
+    <string name="rule_cooldown">Afkoelperiode (minuten)</string>
+    <string name="rule_not_contains_requires_app">\"Bevat NIET\"-regels vereisen een specifiek app-pakket, anders zou elk ander scherm ten onrechte overeenkomen.</string>
+    <string name="rule_save">Opslaan</string>
+    <string name="rule_delete">Verwijderen</string>
+    <string name="rule_cancel">Annuleren</string>
+    <string name="rule_row_all_apps">alle apps</string>
+    <string name="rule_row_status_active">actief</string>
+    <string name="rule_row_status_disabled">uitgeschakeld</string>
+    <string name="rule_row_summary">%1$s • %2$s • %3$s</string>
+
+    <string name="log_title">Meldingenlog</string>
+    <string name="log_empty">Nog geen meldingen.</string>
+    <string name="log_entry_title">\"%1$s\" — %2$s</string>
+    <string name="log_channels_label">Kanalen: %1$s</string>
+    <string name="log_channel_notification">melding</string>
+    <string name="log_channel_email">e-mail</string>
+    <string name="log_channel_none">geen</string>
+
+    <string name="settings_title">E-mail instellingen (SMTP)</string>
+    <string name="settings_host">SMTP-server (host)</string>
+    <string name="settings_port">Poort</string>
+    <string name="settings_username">Gebruikersnaam</string>
+    <string name="settings_password">App-wachtwoord</string>
+    <string name="settings_from">Afzenderadres</string>
+    <string name="settings_to">Ontvangeradres</string>
+    <string name="settings_use_tls">Gebruik TLS</string>
+    <string name="settings_save">Instellingen opslaan</string>
+    <string name="settings_test_email">Test e-mail versturen</string>
+    <string name="settings_saved">Instellingen opgeslagen</string>
+    <string name="settings_test_success">Test e-mail is verzonden</string>
+    <string name="settings_test_failure">Versturen mislukt: %1$s</string>
+    <string name="settings_test_email_subject">UnetworkMonitor testbericht</string>
+    <string name="settings_test_email_body">Dit is een test e-mail vanuit de UnetworkMonitor app. Als je dit ontvangt, werken de SMTP-instellingen correct.</string>
+
+    <string name="settings_language_section">Language / Taal</string>
+    <string name="language_option_english">English</string>
+    <string name="language_option_dutch">Nederlands</string>
+
+    <string name="notification_channel_name">Trefwoord-meldingen</string>
+    <string name="notification_channel_description">Meldingen wanneer een ingesteld trefwoord op het scherm wordt gevonden</string>
+    <string name="notification_title">Trefwoord gevonden: %1$s</string>
+    <string name="notification_text">App: %1$s — %2$s</string>
+
+    <string name="alert_email_subject">UnetworkMonitor: trefwoord \"%1$s\" gevonden</string>
+    <string name="alert_email_intro">UnetworkMonitor heeft een trefwoord gevonden.</string>
+    <string name="alert_email_keyword_label">Trefwoord: %1$s</string>
+    <string name="alert_email_app_label">App: %1$s</string>
+    <string name="alert_email_time_label">Tijdstip: %1$s</string>
+    <string name="alert_email_fragment_label">Fragment:</string>
+</resources>
