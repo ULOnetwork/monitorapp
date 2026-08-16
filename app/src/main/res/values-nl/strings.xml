@@ -54,6 +54,7 @@
     <string name="log_channel_notification">melding</string>
     <string name="log_channel_email">e-mail</string>
     <string name="log_channel_none">geen</string>
+    <string name="log_snippet_no_text">(Geen tekst gevonden op het scherm)</string>
 
     <string name="settings_title">E-mail instellingen (Mailjet)</string>
     <string name="settings_explanation">E-mailmeldingen worden verstuurd via de Mailjet API over HTTPS (niet via SMTP), omdat SMTP-poorten vaak geblokkeerd worden door netwerkfirewalls. Zie de README voor het aanmaken van een Mailjet-account en waar je deze waarden vindt.</string>

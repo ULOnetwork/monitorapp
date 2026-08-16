@@ -32,8 +32,10 @@ class RuleEvaluator(private val context: Context) {
      * foreground. Suspends until logging/notifying for any matches has been handled.
      */
     suspend fun evaluate(appPackage: String, screenText: String) = withContext(Dispatchers.Default) {
-        if (screenText.isBlank()) return@withContext
-
+        // Note: screenText may legitimately be blank (e.g. a sparse/loading screen, or the
+        // accessibility tree exposed no text). Do NOT skip evaluation in that case — a
+        // NOT_CONTAINS rule is specifically meant to fire when its keyword is absent, and a blank
+        // screen is the clearest possible case of "absent".
         val rules = database.keywordRuleDao().getEnabledRules()
         val now = System.currentTimeMillis()
 
@@ -115,7 +117,7 @@ class RuleEvaluator(private val context: Context) {
     private fun buildSnippet(screenText: String, rule: KeywordRule): String {
         val maxLen = 200
         if (rule.matchMode == MatchMode.NOT_CONTAINS) {
-            return screenText.take(maxLen)
+            return screenText.take(maxLen).ifBlank { context.getString(R.string.log_snippet_no_text) }
         }
 
         val regex = buildKeywordRegex(rule.keyword, rule.caseSensitive)

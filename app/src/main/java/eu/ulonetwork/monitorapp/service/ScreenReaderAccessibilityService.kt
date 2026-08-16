@@ -58,20 +58,27 @@ class ScreenReaderAccessibilityService : AccessibilityService() {
     }
 
     private suspend fun extractAndEvaluate(eventPackageName: String?) {
-        val root = rootInActiveWindow ?: return
-        val appPackage = eventPackageName ?: root.packageName?.toString() ?: return
+        val root = rootInActiveWindow
+        val appPackage = eventPackageName ?: root?.packageName?.toString() ?: return
 
-        val builder = StringBuilder()
-        try {
-            collectText(root, builder)
-        } finally {
-            root.recycle()
+        // Deliberately evaluate even when no text is found (root missing, or a genuinely blank/
+        // sparse screen): a NOT_CONTAINS rule is meant to fire exactly when its keyword is absent,
+        // which includes the case where there's little or no text on screen at all. Skipping
+        // evaluation on blank text would silently prevent NOT_CONTAINS rules from ever triggering
+        // in their most common use case.
+        val screenText = if (root != null) {
+            val builder = StringBuilder()
+            try {
+                collectText(root, builder)
+            } finally {
+                root.recycle()
+            }
+            builder.toString()
+        } else {
+            ""
         }
 
-        val screenText = builder.toString()
-        if (screenText.isNotBlank()) {
-            ruleEvaluator.evaluate(appPackage, screenText)
-        }
+        ruleEvaluator.evaluate(appPackage, screenText)
     }
 
     /**
