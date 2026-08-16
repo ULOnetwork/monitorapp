@@ -119,6 +119,24 @@ een fout) verschijnt onderaan het scherm.
 De Mailjet API Key en Secret Key worden op het toestel opgeslagen met `EncryptedSharedPreferences`,
 dus versleuteld en nooit in platte tekst.
 
+### Instellingen overzetten naar een ander apparaat
+
+Onderaan het "E-mail instellingen"-scherm staat een sectie om deze Mailjet-configuratie tussen je
+eigen apparaten over te zetten zonder de API Key en Secret Key opnieuw over te typen:
+
+1. Tik op het ene apparaat op **"Genereer code (kopieert naar klembord)"**. Dit zet een code met
+   het voorvoegsel `UMJMAIL1:` op het klembord en toont 'm ook in een tekstveld om handmatig te
+   kopiëren.
+2. Plak deze code op het andere apparaat in het veld **"Plak hier de code"** en tik op
+   **"Importeren"**. De velden hierboven (API Key, Secret Key, afzender, afzendernaam, ontvanger)
+   worden dan gevuld met de geïmporteerde waarden.
+3. Tik daarna nog op **"Instellingen opslaan"** om de import te bevestigen — importeren vult alleen
+   de velden, het slaat nog niet automatisch op.
+
+**Let op:** deze code bevat je API Key en Secret Key in decodeerbare vorm (base64), dus behandel
+'m als een wachtwoord — deel 'm niet via chat-apps of notities die naar derden gesynchroniseerd
+worden.
+
 ## 6. Taal van de app
 
 De app toont voorlopig altijd **Engels**, ongeacht de systeemtaal van het toestel. Er is voor nu
@@ -143,7 +161,8 @@ herbouwwerkzaamheden.
 - **Meldingenlog**: chronologisch overzicht van alle gevonden trefwoorden, met tijdstip, app en
   tekstfragment.
 - **E-mail instellingen**: Mailjet-configuratie (API Key/Secret Key, afzender, ontvanger) met
-  testknop. E-mail wordt verstuurd via HTTPS naar de Mailjet Send API, niet via SMTP.
+  testknop. E-mail wordt verstuurd via HTTPS naar de Mailjet Send API, niet via SMTP. Instellingen
+  kunnen via een kopieerbare code worden overgezet naar andere apparaten.
 
 ## Herbouwen na wijzigingen
 

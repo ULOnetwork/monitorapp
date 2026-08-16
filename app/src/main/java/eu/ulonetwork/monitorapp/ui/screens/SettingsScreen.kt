@@ -34,14 +34,17 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.core.os.LocaleListCompat
 import eu.ulonetwork.monitorapp.R
 import eu.ulonetwork.monitorapp.data.MailjetSettings
+import eu.ulonetwork.monitorapp.data.MailjetSettingsCodec
 import eu.ulonetwork.monitorapp.data.PreferencesManager
 import eu.ulonetwork.monitorapp.mail.MailjetMailSender
 import kotlinx.coroutines.launch
@@ -59,6 +62,7 @@ fun SettingsScreen() {
     val context = LocalContext.current
     val preferencesManager = remember { PreferencesManager(context) }
     val mailSender = remember { MailjetMailSender() }
+    val clipboardManager = LocalClipboardManager.current
     val scope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
 
@@ -68,6 +72,8 @@ fun SettingsScreen() {
     var fromName by remember { mutableStateOf("") }
     var toAddress by remember { mutableStateOf("") }
     var isSendingTest by remember { mutableStateOf(false) }
+    var exportCode by remember { mutableStateOf("") }
+    var importInput by remember { mutableStateOf("") }
 
     LaunchedEffect(Unit) {
         val settings = preferencesManager.getMailjetSettings()
@@ -179,6 +185,64 @@ fun SettingsScreen() {
                 } else {
                     Text(stringResource(R.string.settings_test_email))
                 }
+            }
+
+            Spacer(modifier = Modifier.height(32.dp))
+            Text(text = stringResource(R.string.settings_transfer_title), style = MaterialTheme.typography.titleMedium)
+            Spacer(modifier = Modifier.height(4.dp))
+            Text(text = stringResource(R.string.settings_transfer_explanation), style = MaterialTheme.typography.bodySmall)
+
+            Spacer(modifier = Modifier.height(12.dp))
+            OutlinedButton(
+                onClick = {
+                    exportCode = MailjetSettingsCodec.encode(currentSettings())
+                    clipboardManager.setText(AnnotatedString(exportCode))
+                    scope.launch { snackbarHostState.showSnackbar(context.getString(R.string.settings_export_copied)) }
+                },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(stringResource(R.string.settings_export_button))
+            }
+            if (exportCode.isNotBlank()) {
+                Spacer(modifier = Modifier.height(8.dp))
+                OutlinedTextField(
+                    value = exportCode,
+                    onValueChange = {},
+                    readOnly = true,
+                    label = { Text(stringResource(R.string.settings_export_label)) },
+                    supportingText = { Text(stringResource(R.string.settings_export_hint)) },
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+            OutlinedTextField(
+                value = importInput,
+                onValueChange = { importInput = it },
+                label = { Text(stringResource(R.string.settings_import_label)) },
+                placeholder = { Text(stringResource(R.string.settings_import_placeholder)) },
+                minLines = 2,
+                modifier = Modifier.fillMaxWidth()
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            OutlinedButton(
+                onClick = {
+                    val decoded = MailjetSettingsCodec.decode(importInput)
+                    if (decoded == null) {
+                        scope.launch { snackbarHostState.showSnackbar(context.getString(R.string.settings_import_invalid)) }
+                    } else {
+                        apiKey = decoded.apiKey
+                        secretKey = decoded.secretKey
+                        fromAddress = decoded.fromAddress
+                        fromName = decoded.fromName
+                        toAddress = decoded.toAddress
+                        importInput = ""
+                        scope.launch { snackbarHostState.showSnackbar(context.getString(R.string.settings_import_success)) }
+                    }
+                },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(stringResource(R.string.settings_import_button))
             }
 
             if (LANGUAGE_PICKER_ENABLED) {

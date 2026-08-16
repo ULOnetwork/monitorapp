@@ -72,6 +72,18 @@
     <string name="settings_test_email_subject">UnetworkMonitor testbericht</string>
     <string name="settings_test_email_body">Dit is een test e-mail vanuit de UnetworkMonitor app. Als je dit ontvangt, werken de Mailjet-instellingen correct.</string>
 
+    <string name="settings_transfer_title">Instellingen overzetten tussen apparaten</string>
+    <string name="settings_transfer_explanation">Genereer hieronder een code om deze Mailjet-instellingen naar een ander apparaat te kopiëren, of plak een code die op een ander apparaat is gegenereerd om ze hier te importeren. De code bevat je API Key en Secret Key in decodeerbare vorm, behandel de code dus als een wachtwoord.</string>
+    <string name="settings_export_button">Genereer code (kopieert naar klembord)</string>
+    <string name="settings_export_copied">Code gekopieerd naar klembord</string>
+    <string name="settings_export_label">Exportcode</string>
+    <string name="settings_export_hint">Kopieer deze tekst en plak \'m in het importveld op een ander apparaat</string>
+    <string name="settings_import_label">Plak hier de code</string>
+    <string name="settings_import_placeholder">UMJMAIL1:…</string>
+    <string name="settings_import_button">Importeren</string>
+    <string name="settings_import_success">Instellingen geïmporteerd — vergeet niet op Opslaan te tikken</string>
+    <string name="settings_import_invalid">Dit lijkt geen geldige instellingencode</string>
+
     <string name="settings_language_section">Language / Taal</string>
     <string name="language_option_english">English</string>
     <string name="language_option_dutch">Nederlands</string>
