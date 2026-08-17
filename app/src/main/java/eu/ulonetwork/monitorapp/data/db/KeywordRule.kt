@@ -29,5 +29,13 @@ data class KeywordRule(
     val cooldownMinutes: Int = 10,
     val lastTriggeredAt: Long? = null,
     /** Whether the rule's condition currently fails to hold (an ISSUE alert has fired and no RESOLVED alert has fired since). */
-    val issueActive: Boolean = false
+    val issueActive: Boolean = false,
+    /**
+     * Whether [issueActive] reflects a condition that has actually been observed to change, as
+     * opposed to just the rule's freshly-reset default. A new or just-edited rule doesn't know
+     * yet whether its condition currently holds, so its first evaluation only records that as the
+     * starting baseline instead of alerting — otherwise saving a rule while the monitored screen
+     * hasn't loaded/navigated to its expected state yet would immediately fire a false ISSUE.
+     */
+    val hasBaseline: Boolean = false
 )

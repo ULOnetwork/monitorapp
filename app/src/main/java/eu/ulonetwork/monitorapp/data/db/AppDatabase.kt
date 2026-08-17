@@ -10,7 +10,7 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 
 @Database(
     entities = [KeywordRule::class, AlertLogEntry::class],
-    version = 3,
+    version = 4,
     exportSchema = false
 )
 @TypeConverters(Converters::class)
@@ -29,7 +29,7 @@ abstract class AppDatabase : RoomDatabase() {
                     context.applicationContext,
                     AppDatabase::class.java,
                     "unetworkmonitor.db"
-                ).addMigrations(MIGRATION_1_2, MIGRATION_2_3).build().also { instance = it }
+                ).addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4).build().also { instance = it }
             }
         }
 
@@ -44,6 +44,15 @@ abstract class AppDatabase : RoomDatabase() {
         private val MIGRATION_2_3 = object : Migration(2, 3) {
             override fun migrate(db: SupportSQLiteDatabase) {
                 db.execSQL("ALTER TABLE keyword_rules ADD COLUMN screenGateKeyword TEXT")
+            }
+        }
+
+        // hasBaseline defaults to 0 for existing rules too: on the next evaluation each rule just
+        // silently records its current state as the baseline instead of alerting, rather than
+        // risking an ISSUE/RESOLVED storm from every pre-existing rule right after this update.
+        private val MIGRATION_3_4 = object : Migration(3, 4) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("ALTER TABLE keyword_rules ADD COLUMN hasBaseline INTEGER NOT NULL DEFAULT 0")
             }
         }
     }

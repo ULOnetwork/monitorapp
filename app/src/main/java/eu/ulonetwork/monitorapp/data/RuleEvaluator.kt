@@ -54,6 +54,18 @@ class RuleEvaluator(private val context: Context) {
             if (!screenGateOpen(rule, screenText)) continue
 
             val isMatching = matches(rule, screenText)
+
+            if (!rule.hasBaseline) {
+                // First observation since this rule was created/edited/reset: we don't yet know
+                // whether the condition holds, so just record the current state as the starting
+                // point without alerting. Otherwise saving a rule (or a screen-gated rule simply
+                // reaching its gated screen for the first time) before the monitored screen has
+                // settled into its expected state would immediately look like a transition and
+                // fire a false ISSUE.
+                database.keywordRuleDao().establishBaseline(rule.id, issueActive = !isMatching)
+                continue
+            }
+
             when {
                 !isMatching && !rule.issueActive && cooldownElapsed(rule, now) ->
                     deliverAlert(rule, appPackage, screenText, now, AlertEventType.ISSUE, newIssueActive = true)

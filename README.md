@@ -211,7 +211,12 @@ herbouwwerkzaamheden.
   onthouden; bij het bewerken van een bestaande regel wordt de status gereset zodra de
   trefwoord-voorwaarde zelf verandert (trefwoord, overeenkomstmodus, hoofdlettergevoeligheid,
   app-pakketfilter of scherm-herkenningstekst), maar blijft behouden als alleen
-  kanalen/afkoelperiode/aan-uit worden aangepast.
+  kanalen/afkoelperiode/aan-uit worden aangepast. Een nieuwe of net-gereset regel weet bij zijn
+  allereerste controle nog niet of de voorwaarde al dan niet klopt, dus die eerste controle legt
+  alleen de startsituatie vast zonder te melden — pas een echte afwijking dáárna levert een
+  ISSUE-melding op. Zonder dit zou het opslaan van een regel (of het voor het eerst bereiken van
+  een scherm achter een scherm-herkenningstekst) meteen een valse ISSUE kunnen geven als het
+  gemonitorde scherm op dat moment nog niet in de verwachte toestand staat.
 - **Betrouwbaardere e-maillevering**: het versturen van de alert-e-mail en het wegschrijven van de
   logregel kunnen niet langer stilletjes worden afgebroken doordat het scherm tijdens het versturen
   van de e-mail (tot 15 seconden) opnieuw wijzigt. Als het versturen van een e-mail toch mislukt

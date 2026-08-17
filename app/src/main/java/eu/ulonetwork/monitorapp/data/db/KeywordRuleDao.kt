@@ -31,4 +31,7 @@ interface KeywordRuleDao {
 
     @Query("UPDATE keyword_rules SET issueActive = :active, lastTriggeredAt = :timestamp WHERE id = :ruleId")
     suspend fun updateIssueState(ruleId: Long, active: Boolean, timestamp: Long)
+
+    @Query("UPDATE keyword_rules SET issueActive = :issueActive, hasBaseline = 1 WHERE id = :ruleId")
+    suspend fun establishBaseline(ruleId: Long, issueActive: Boolean)
 }

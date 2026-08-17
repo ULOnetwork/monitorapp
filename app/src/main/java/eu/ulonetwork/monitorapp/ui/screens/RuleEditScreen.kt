@@ -228,7 +228,8 @@ fun RuleEditScreen(ruleId: Long, onDone: () -> Unit) {
                         screenGateKeyword = trimmedScreenGate,
                         cooldownMinutes = cooldownMinutes.toIntOrNull() ?: 10,
                         lastTriggeredAt = if (conditionChanged) null else existingRule?.lastTriggeredAt,
-                        issueActive = if (conditionChanged) false else existingRule?.issueActive ?: false
+                        issueActive = if (conditionChanged) false else existingRule?.issueActive ?: false,
+                        hasBaseline = if (conditionChanged) false else existingRule?.hasBaseline ?: false
                     )
                     scope.launch {
                         database.keywordRuleDao().upsert(rule)
