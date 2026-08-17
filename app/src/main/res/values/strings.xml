@@ -98,10 +98,16 @@
     <string name="notification_channel_name">Keyword alerts</string>
     <string name="notification_channel_description">Alerts when a configured keyword is found on screen</string>
     <string name="notification_title">Keyword found: %1$s</string>
+    <string name="notification_title_not_found">Keyword NOT found: %1$s</string>
     <string name="notification_text">App: %1$s — %2$s</string>
 
     <string name="alert_email_subject">UnetworkMonitor: keyword \"%1$s\" found</string>
+    <string name="alert_email_subject_not_found">UnetworkMonitor: keyword \"%1$s\" NOT found</string>
     <string name="alert_email_intro">UnetworkMonitor found a keyword.</string>
+    <string name="alert_email_intro_not_found">UnetworkMonitor detected that a keyword is absent from the screen.</string>
+    <string name="alert_email_device_name_label">Device name: %1$s</string>
+    <string name="alert_email_device_id_label">Device ID: %1$s</string>
+    <string name="alert_email_ip_label">IP address: %1$s</string>
     <string name="alert_email_keyword_label">Keyword: %1$s</string>
     <string name="alert_email_app_label">App: %1$s</string>
     <string name="alert_email_time_label">Time: %1$s</string>

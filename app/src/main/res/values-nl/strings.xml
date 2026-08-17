@@ -98,10 +98,16 @@
     <string name="notification_channel_name">Trefwoord-meldingen</string>
     <string name="notification_channel_description">Meldingen wanneer een ingesteld trefwoord op het scherm wordt gevonden</string>
     <string name="notification_title">Trefwoord gevonden: %1$s</string>
+    <string name="notification_title_not_found">Trefwoord NIET gevonden: %1$s</string>
     <string name="notification_text">App: %1$s — %2$s</string>
 
     <string name="alert_email_subject">UnetworkMonitor: trefwoord \"%1$s\" gevonden</string>
+    <string name="alert_email_subject_not_found">UnetworkMonitor: trefwoord \"%1$s\" NIET gevonden</string>
     <string name="alert_email_intro">UnetworkMonitor heeft een trefwoord gevonden.</string>
+    <string name="alert_email_intro_not_found">UnetworkMonitor heeft geconstateerd dat een trefwoord ontbreekt op het scherm.</string>
+    <string name="alert_email_device_name_label">Apparaatnaam: %1$s</string>
+    <string name="alert_email_device_id_label">Apparaat-ID: %1$s</string>
+    <string name="alert_email_ip_label">IP-adres: %1$s</string>
     <string name="alert_email_keyword_label">Trefwoord: %1$s</string>
     <string name="alert_email_app_label">App: %1$s</string>
     <string name="alert_email_time_label">Tijdstip: %1$s</string>

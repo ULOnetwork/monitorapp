@@ -8,6 +8,7 @@ import eu.ulonetwork.monitorapp.data.db.AppDatabase
 import eu.ulonetwork.monitorapp.data.db.KeywordRule
 import eu.ulonetwork.monitorapp.data.db.MatchMode
 import eu.ulonetwork.monitorapp.mail.MailjetMailSender
+import eu.ulonetwork.monitorapp.util.DeviceInfoProvider
 import eu.ulonetwork.monitorapp.util.NotificationHelper
 import eu.ulonetwork.monitorapp.util.buildKeywordRegex
 import kotlinx.coroutines.Dispatchers
@@ -85,14 +86,21 @@ class RuleEvaluator(private val context: Context) {
         var notifiedEmail = false
 
         if (rule.notifyLocal) {
-            NotificationHelper.showKeywordAlert(context, rule.keyword, appPackage, snippet, rule.id)
+            NotificationHelper.showKeywordAlert(
+                context, rule.keyword, rule.matchMode, appPackage, snippet, rule.id
+            )
         }
 
         if (rule.notifyEmail) {
             val settings = preferencesManager.getMailjetSettings()
+            val subjectRes = if (rule.matchMode == MatchMode.NOT_CONTAINS) {
+                R.string.alert_email_subject_not_found
+            } else {
+                R.string.alert_email_subject
+            }
             val result = mailSender.send(
                 settings = settings,
-                subject = context.getString(R.string.alert_email_subject, rule.keyword),
+                subject = context.getString(subjectRes, rule.keyword),
                 body = buildEmailBody(rule, appPackage, snippet, now)
             )
             notifiedEmail = result is MailjetMailSender.Result.Success
@@ -136,8 +144,17 @@ class RuleEvaluator(private val context: Context) {
 
     private fun buildEmailBody(rule: KeywordRule, appPackage: String, snippet: String, timestamp: Long): String {
         val formatter = SimpleDateFormat("dd-MM-yyyy HH:mm:ss", Locale.getDefault())
+        val introRes = if (rule.matchMode == MatchMode.NOT_CONTAINS) {
+            R.string.alert_email_intro_not_found
+        } else {
+            R.string.alert_email_intro
+        }
         return buildString {
-            appendLine(context.getString(R.string.alert_email_intro))
+            appendLine(context.getString(R.string.alert_email_device_name_label, DeviceInfoProvider.deviceName()))
+            appendLine(context.getString(R.string.alert_email_device_id_label, DeviceInfoProvider.deviceIdentifier(context)))
+            appendLine(context.getString(R.string.alert_email_ip_label, DeviceInfoProvider.localIpAddress()))
+            appendLine()
+            appendLine(context.getString(introRes))
             appendLine()
             appendLine(context.getString(R.string.alert_email_keyword_label, rule.keyword))
             appendLine(context.getString(R.string.alert_email_app_label, appPackage))

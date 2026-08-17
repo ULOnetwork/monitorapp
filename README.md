@@ -197,6 +197,14 @@ herbouwwerkzaamheden.
 - **E-mail instellingen**: Mailjet-configuratie (API Key/Secret Key, afzender, ontvanger) met
   testknop. E-mail wordt verstuurd via HTTPS naar de Mailjet Send API, niet via SMTP. Instellingen
   kunnen via een kopieerbare code worden overgezet naar andere apparaten.
+- **Meldingen bij "Bevat NIET"-regels**: de tekst van de melding en e-mail geeft nu correct aan dat
+  het trefwoord NIET is aangetroffen, in plaats van de melding voor een gewone "Bevat"-regel te
+  hergebruiken.
+- **Apparaatgegevens in de e-mail**: elke alert-e-mail begint met apparaatnaam (merk/model),
+  een apparaat-ID en het lokale IP-adres van het toestel. Android staat reguliere apps sinds
+  Android 10 niet meer toe om het echte hardware-serienummer op te vragen (dat is voorbehouden aan
+  systeem-/device-ownerapps), dus als apparaat-ID wordt de `ANDROID_ID` gebruikt: een stabiele,
+  per-toestel-en-per-app identifier die niet verandert zolang de app geïnstalleerd blijft.
 
 ## Herbouwen na wijzigingen
 
