@@ -89,91 +89,100 @@ fun RulesScreen(onAddRule: () -> Unit, onEditRule: (Long) -> Unit) {
             }
         }
     ) { innerPadding ->
-        Column(modifier = Modifier.padding(innerPadding).fillMaxSize().padding(16.dp)) {
-            Text(text = stringResource(R.string.rules_title), style = MaterialTheme.typography.headlineSmall)
-            Spacer(modifier = Modifier.height(12.dp))
+        // The whole screen is a single LazyColumn (rather than a fixed-height rules list above a
+        // separately-laid-out export/import section) so that everything — including the
+        // export/import controls — scrolls together. With two independent sections, the
+        // export/import area had no scroll of its own and its Import button could end up pushed
+        // off-screen and unreachable once the pasted code grew the import field's height.
+        LazyColumn(modifier = Modifier.padding(innerPadding).fillMaxSize().padding(16.dp)) {
+            item {
+                Text(text = stringResource(R.string.rules_title), style = MaterialTheme.typography.headlineSmall)
+                Spacer(modifier = Modifier.height(12.dp))
+            }
 
             if (rules.isEmpty()) {
-                Text(text = stringResource(R.string.rules_empty), style = MaterialTheme.typography.bodyMedium)
+                item {
+                    Text(text = stringResource(R.string.rules_empty), style = MaterialTheme.typography.bodyMedium)
+                }
             } else {
-                LazyColumn(modifier = Modifier.weight(1f)) {
-                    items(rules, key = { it.id }) { rule ->
-                        RuleRow(
-                            rule = rule,
-                            onClick = { onEditRule(rule.id) },
-                            onDelete = {
-                                scope.launch { database.keywordRuleDao().delete(rule) }
-                            }
-                        )
-                        Spacer(modifier = Modifier.height(8.dp))
-                    }
+                items(rules, key = { it.id }) { rule ->
+                    RuleRow(
+                        rule = rule,
+                        onClick = { onEditRule(rule.id) },
+                        onDelete = {
+                            scope.launch { database.keywordRuleDao().delete(rule) }
+                        }
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
                 }
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
-            Text(text = stringResource(R.string.rules_transfer_title), style = MaterialTheme.typography.titleMedium)
-            Spacer(modifier = Modifier.height(4.dp))
-            Text(text = stringResource(R.string.rules_transfer_explanation), style = MaterialTheme.typography.bodySmall)
+            item {
+                Spacer(modifier = Modifier.height(16.dp))
+                Text(text = stringResource(R.string.rules_transfer_title), style = MaterialTheme.typography.titleMedium)
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(text = stringResource(R.string.rules_transfer_explanation), style = MaterialTheme.typography.bodySmall)
 
-            Spacer(modifier = Modifier.height(8.dp))
-            OutlinedButton(
-                onClick = {
-                    exportCode = KeywordRulesCodec.encode(rules)
-                    clipboardManager.setText(AnnotatedString(exportCode))
-                    writeRulesExportFile(context, exportCode)
-                    scope.launch { snackbarHostState.showSnackbar(context.getString(R.string.settings_export_copied)) }
-                },
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text(stringResource(R.string.rules_export_button))
-            }
-            if (exportCode.isNotBlank()) {
                 Spacer(modifier = Modifier.height(8.dp))
+                OutlinedButton(
+                    onClick = {
+                        exportCode = KeywordRulesCodec.encode(rules)
+                        clipboardManager.setText(AnnotatedString(exportCode))
+                        writeRulesExportFile(context, exportCode)
+                        scope.launch { snackbarHostState.showSnackbar(context.getString(R.string.settings_export_copied)) }
+                    },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(stringResource(R.string.rules_export_button))
+                }
+                if (exportCode.isNotBlank()) {
+                    Spacer(modifier = Modifier.height(8.dp))
+                    OutlinedTextField(
+                        value = exportCode,
+                        onValueChange = {},
+                        readOnly = true,
+                        label = { Text(stringResource(R.string.settings_export_label)) },
+                        supportingText = { Text(stringResource(R.string.settings_export_hint)) },
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text(
+                        text = stringResource(R.string.settings_export_file_hint, RULES_EXPORT_FILE_NAME),
+                        style = MaterialTheme.typography.bodySmall
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(16.dp))
                 OutlinedTextField(
-                    value = exportCode,
-                    onValueChange = {},
-                    readOnly = true,
-                    label = { Text(stringResource(R.string.settings_export_label)) },
-                    supportingText = { Text(stringResource(R.string.settings_export_hint)) },
+                    value = importInput,
+                    onValueChange = { importInput = it },
+                    label = { Text(stringResource(R.string.settings_import_label)) },
+                    placeholder = { Text(stringResource(R.string.rules_import_placeholder)) },
+                    minLines = 2,
                     modifier = Modifier.fillMaxWidth()
                 )
-                Spacer(modifier = Modifier.height(4.dp))
-                Text(
-                    text = stringResource(R.string.settings_export_file_hint, RULES_EXPORT_FILE_NAME),
-                    style = MaterialTheme.typography.bodySmall
-                )
-            }
-
-            Spacer(modifier = Modifier.height(16.dp))
-            OutlinedTextField(
-                value = importInput,
-                onValueChange = { importInput = it },
-                label = { Text(stringResource(R.string.settings_import_label)) },
-                placeholder = { Text(stringResource(R.string.rules_import_placeholder)) },
-                minLines = 2,
-                modifier = Modifier.fillMaxWidth()
-            )
-            Spacer(modifier = Modifier.height(8.dp))
-            OutlinedButton(
-                onClick = {
-                    val decoded = KeywordRulesCodec.decode(importInput)
-                    if (decoded == null) {
-                        scope.launch { snackbarHostState.showSnackbar(context.getString(R.string.settings_import_invalid)) }
-                    } else {
-                        scope.launch {
-                            for (rule in decoded) {
-                                database.keywordRuleDao().upsert(rule)
+                Spacer(modifier = Modifier.height(8.dp))
+                OutlinedButton(
+                    onClick = {
+                        val decoded = KeywordRulesCodec.decode(importInput)
+                        if (decoded == null) {
+                            scope.launch { snackbarHostState.showSnackbar(context.getString(R.string.settings_import_invalid)) }
+                        } else {
+                            scope.launch {
+                                for (rule in decoded) {
+                                    database.keywordRuleDao().upsert(rule)
+                                }
+                                importInput = ""
+                                snackbarHostState.showSnackbar(
+                                    context.getString(R.string.rules_import_success, decoded.size)
+                                )
                             }
-                            importInput = ""
-                            snackbarHostState.showSnackbar(
-                                context.getString(R.string.rules_import_success, decoded.size)
-                            )
                         }
-                    }
-                },
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text(stringResource(R.string.settings_import_button))
+                    },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(stringResource(R.string.settings_import_button))
+                }
             }
         }
     }
