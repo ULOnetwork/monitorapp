@@ -192,14 +192,26 @@ herbouwwerkzaamheden.
   de twee delen als aparte tekstelementen op het scherm staan. De hele lijst met regels kan via een
   kopieerbare code worden overgezet naar andere apparaten (regels worden bij import toegevoegd, niet
   overschreven).
-- **Meldingenlog**: chronologisch overzicht van alle gevonden trefwoorden, met tijdstip, app en
-  tekstfragment.
+- **ISSUE/RESOLVED-meldingen**: een regel meldt zich niet meer bij elke afzonderlijke controle
+  waarin de voorwaarde geldt, maar alleen bij een statusovergang. Zodra de voorwaarde van een
+  regel voor het eerst waar wordt, komt er één ISSUE-melding (lokaal en/of e-mail, afhankelijk van
+  de kanalen die voor die regel zijn ingeschakeld). Zolang de voorwaarde blijft gelden, wordt er
+  stil doorgecontroleerd zonder nieuwe meldingen. Pas zodra de voorwaarde weer niet meer geldt komt
+  er één RESOLVED-melding. De afkoelperiode van de regel geldt als minimale tijd tussen zulke
+  statusovergangen, in beide richtingen. Deze status (`issueActive`) wordt per regel onthouden;
+  bij het bewerken van een bestaande regel wordt de status gereset zodra de trefwoord-voorwaarde
+  zelf verandert (trefwoord, overeenkomstmodus, hoofdlettergevoeligheid of app-pakketfilter), maar
+  blijft behouden als alleen kanalen/afkoelperiode/aan-uit worden aangepast.
+- **Betrouwbaardere e-maillevering**: het versturen van de alert-e-mail en het wegschrijven van de
+  logregel kunnen niet langer stilletjes worden afgebroken doordat het scherm tijdens het versturen
+  van de e-mail (tot 15 seconden) opnieuw wijzigt. Als het versturen van een e-mail toch mislukt
+  (bijv. door een fout van Mailjet), toont het meldingenlog voortaan de exacte foutmelding bij die
+  logregel, in plaats van alleen "geen e-mail" te tonen zonder reden.
+- **Meldingenlog**: chronologisch overzicht van ISSUE/RESOLVED-gebeurtenissen, met tijdstip, app,
+  tekstfragment en (bij een mislukte e-mail) de foutmelding.
 - **E-mail instellingen**: Mailjet-configuratie (API Key/Secret Key, afzender, ontvanger) met
   testknop. E-mail wordt verstuurd via HTTPS naar de Mailjet Send API, niet via SMTP. Instellingen
   kunnen via een kopieerbare code worden overgezet naar andere apparaten.
-- **Meldingen bij "Bevat NIET"-regels**: de tekst van de melding en e-mail geeft nu correct aan dat
-  het trefwoord NIET is aangetroffen, in plaats van de melding voor een gewone "Bevat"-regel te
-  hergebruiken.
 - **Apparaatgegevens in de e-mail**: elke alert-e-mail begint met apparaatnaam (merk/model),
   een apparaat-ID en het lokale IP-adres van het toestel. Android staat reguliere apps sinds
   Android 10 niet meer toe om het echte hardware-serienummer op te vragen (dat is voorbehouden aan

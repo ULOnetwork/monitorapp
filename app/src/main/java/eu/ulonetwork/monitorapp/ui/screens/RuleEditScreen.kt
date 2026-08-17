@@ -195,9 +195,17 @@ fun RuleEditScreen(ruleId: Long, onDone: () -> Unit) {
                     }
                     showValidationError = false
 
+                    val trimmedKeyword = keyword.trim()
+                    val conditionChanged = existingRule?.let {
+                        it.keyword != trimmedKeyword ||
+                            it.matchMode != matchMode ||
+                            it.caseSensitive != caseSensitive ||
+                            it.appPackageFilter != trimmedFilter
+                    } ?: false
+
                     val rule = KeywordRule(
                         id = existingRule?.id ?: 0,
-                        keyword = keyword.trim(),
+                        keyword = trimmedKeyword,
                         matchMode = matchMode,
                         caseSensitive = caseSensitive,
                         enabled = enabled,
@@ -205,7 +213,8 @@ fun RuleEditScreen(ruleId: Long, onDone: () -> Unit) {
                         notifyEmail = notifyEmail,
                         appPackageFilter = trimmedFilter,
                         cooldownMinutes = cooldownMinutes.toIntOrNull() ?: 10,
-                        lastTriggeredAt = existingRule?.lastTriggeredAt
+                        lastTriggeredAt = if (conditionChanged) null else existingRule?.lastTriggeredAt,
+                        issueActive = if (conditionChanged) false else existingRule?.issueActive ?: false
                     )
                     scope.launch {
                         database.keywordRuleDao().upsert(rule)

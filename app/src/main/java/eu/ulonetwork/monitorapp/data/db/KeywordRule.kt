@@ -20,5 +20,7 @@ data class KeywordRule(
     /** Package name this rule is limited to, or null to apply to every app. */
     val appPackageFilter: String? = null,
     val cooldownMinutes: Int = 10,
-    val lastTriggeredAt: Long? = null
+    val lastTriggeredAt: Long? = null,
+    /** Whether the rule's condition is currently matching (an ISSUE alert has fired and no RESOLVED alert has fired since). */
+    val issueActive: Boolean = false
 )

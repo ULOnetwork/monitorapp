@@ -17,5 +17,8 @@ data class AlertLogEntry(
     /** Short excerpt of the on-screen text around/containing the match, truncated. */
     val textSnippet: String,
     val notifiedLocal: Boolean,
-    val notifiedEmail: Boolean
+    val notifiedEmail: Boolean,
+    val eventType: AlertEventType,
+    /** Failure message from [eu.ulonetwork.monitorapp.mail.MailjetMailSender], or null if e-mail wasn't attempted or succeeded. */
+    val emailError: String? = null
 )

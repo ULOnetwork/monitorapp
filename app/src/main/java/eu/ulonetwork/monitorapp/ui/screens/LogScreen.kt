@@ -20,6 +20,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import eu.ulonetwork.monitorapp.R
+import eu.ulonetwork.monitorapp.data.db.AlertEventType
 import eu.ulonetwork.monitorapp.data.db.AlertLogEntry
 import eu.ulonetwork.monitorapp.data.db.AppDatabase
 import java.text.SimpleDateFormat
@@ -55,6 +56,18 @@ private fun LogRow(entry: AlertLogEntry) {
     Card(modifier = Modifier.fillMaxWidth()) {
         Column(modifier = Modifier.padding(12.dp)) {
             Text(text = formatter.format(Date(entry.timestamp)), style = MaterialTheme.typography.bodySmall)
+            val eventTypeLabel = stringResource(
+                if (entry.eventType == AlertEventType.RESOLVED) {
+                    R.string.log_event_type_resolved
+                } else {
+                    R.string.log_event_type_issue
+                }
+            )
+            Text(
+                text = eventTypeLabel,
+                style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.primary
+            )
             Text(
                 text = stringResource(R.string.log_entry_title, entry.matchedKeyword, entry.appPackage),
                 style = MaterialTheme.typography.titleSmall
@@ -70,6 +83,13 @@ private fun LogRow(entry: AlertLogEntry) {
                 if (entry.notifiedEmail) add(emailChannelLabel)
             }.joinToString(", ").ifBlank { noneLabel }
             Text(text = stringResource(R.string.log_channels_label, channels), style = MaterialTheme.typography.bodySmall)
+            if (entry.emailError != null) {
+                Text(
+                    text = stringResource(R.string.log_email_error, entry.emailError),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.error
+                )
+            }
         }
     }
 }

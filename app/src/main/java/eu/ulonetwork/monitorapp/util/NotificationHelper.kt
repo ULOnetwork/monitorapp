@@ -10,7 +10,7 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import eu.ulonetwork.monitorapp.MainActivity
 import eu.ulonetwork.monitorapp.R
-import eu.ulonetwork.monitorapp.data.db.MatchMode
+import eu.ulonetwork.monitorapp.data.db.AlertEventType
 
 object NotificationHelper {
 
@@ -37,7 +37,7 @@ object NotificationHelper {
     fun showKeywordAlert(
         context: Context,
         keyword: String,
-        matchMode: MatchMode,
+        eventType: AlertEventType,
         appPackage: String,
         snippet: String,
         logEntryId: Long
@@ -55,10 +55,10 @@ object NotificationHelper {
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
-        val titleRes = if (matchMode == MatchMode.NOT_CONTAINS) {
-            R.string.notification_title_not_found
+        val titleRes = if (eventType == AlertEventType.RESOLVED) {
+            R.string.notification_title_resolved
         } else {
-            R.string.notification_title
+            R.string.notification_title_issue
         }
 
         val notification = NotificationCompat.Builder(context, CHANNEL_ID)

@@ -56,11 +56,14 @@
     <string name="log_title">Meldingenlog</string>
     <string name="log_empty">Nog geen meldingen.</string>
     <string name="log_entry_title">\"%1$s\" — %2$s</string>
+    <string name="log_event_type_issue">PROBLEEM</string>
+    <string name="log_event_type_resolved">OPGELOST</string>
     <string name="log_channels_label">Kanalen: %1$s</string>
     <string name="log_channel_notification">melding</string>
     <string name="log_channel_email">e-mail</string>
     <string name="log_channel_none">geen</string>
     <string name="log_snippet_no_text">(Geen tekst gevonden op het scherm)</string>
+    <string name="log_email_error">E-mailfout: %1$s</string>
 
     <string name="settings_title">E-mail instellingen (Mailjet)</string>
     <string name="settings_explanation">E-mailmeldingen worden verstuurd via de Mailjet API over HTTPS (niet via SMTP), omdat SMTP-poorten vaak geblokkeerd worden door netwerkfirewalls. Zie de README voor het aanmaken van een Mailjet-account en waar je deze waarden vindt.</string>
@@ -97,14 +100,14 @@
 
     <string name="notification_channel_name">Trefwoord-meldingen</string>
     <string name="notification_channel_description">Meldingen wanneer een ingesteld trefwoord op het scherm wordt gevonden</string>
-    <string name="notification_title">Trefwoord gevonden: %1$s</string>
-    <string name="notification_title_not_found">Trefwoord NIET gevonden: %1$s</string>
+    <string name="notification_title_issue">PROBLEEM: %1$s</string>
+    <string name="notification_title_resolved">OPGELOST: %1$s</string>
     <string name="notification_text">App: %1$s — %2$s</string>
 
-    <string name="alert_email_subject">UnetworkMonitor: trefwoord \"%1$s\" gevonden</string>
-    <string name="alert_email_subject_not_found">UnetworkMonitor: trefwoord \"%1$s\" NIET gevonden</string>
-    <string name="alert_email_intro">UnetworkMonitor heeft een trefwoord gevonden.</string>
-    <string name="alert_email_intro_not_found">UnetworkMonitor heeft geconstateerd dat een trefwoord ontbreekt op het scherm.</string>
+    <string name="alert_email_subject_issue">UnetworkMonitor: PROBLEEM — \"%1$s\"</string>
+    <string name="alert_email_subject_resolved">UnetworkMonitor: OPGELOST — \"%1$s\"</string>
+    <string name="alert_email_intro_issue">UnetworkMonitor heeft geconstateerd dat deze regel nu overeenkomt.</string>
+    <string name="alert_email_intro_resolved">UnetworkMonitor heeft geconstateerd dat deze regel niet meer overeenkomt.</string>
     <string name="alert_email_device_name_label">Apparaatnaam: %1$s</string>
     <string name="alert_email_device_id_label">Apparaat-ID: %1$s</string>
     <string name="alert_email_ip_label">IP-adres: %1$s</string>

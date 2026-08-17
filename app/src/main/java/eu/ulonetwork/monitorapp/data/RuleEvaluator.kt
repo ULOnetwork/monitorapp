@@ -3,6 +3,7 @@ package eu.ulonetwork.monitorapp.data
 import android.content.Context
 import android.util.Log
 import eu.ulonetwork.monitorapp.R
+import eu.ulonetwork.monitorapp.data.db.AlertEventType
 import eu.ulonetwork.monitorapp.data.db.AlertLogEntry
 import eu.ulonetwork.monitorapp.data.db.AppDatabase
 import eu.ulonetwork.monitorapp.data.db.KeywordRule
@@ -12,6 +13,7 @@ import eu.ulonetwork.monitorapp.util.DeviceInfoProvider
 import eu.ulonetwork.monitorapp.util.NotificationHelper
 import eu.ulonetwork.monitorapp.util.buildKeywordRegex
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.withContext
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -21,6 +23,11 @@ import java.util.concurrent.TimeUnit
 /**
  * Evaluates [KeywordRule]s against text extracted from the screen by the accessibility service,
  * logs matches and fires the configured alert channels.
+ *
+ * Alerting is edge-triggered: a rule only notifies when its condition transitions from not
+ * matching to matching (ISSUE) or back from matching to not matching (RESOLVED), not on every
+ * evaluation where the condition happens to hold. [KeywordRule.issueActive] tracks which side of
+ * that transition a rule is currently on.
  */
 class RuleEvaluator(private val context: Context) {
 
@@ -30,7 +37,7 @@ class RuleEvaluator(private val context: Context) {
 
     /**
      * Evaluates all enabled rules against [screenText] observed while [appPackage] is in the
-     * foreground. Suspends until logging/notifying for any matches has been handled.
+     * foreground. Suspends until logging/notifying for any state transitions has been handled.
      */
     suspend fun evaluate(appPackage: String, screenText: String) = withContext(Dispatchers.Default) {
         // Note: screenText may legitimately be blank (e.g. a sparse/loading screen, or the
@@ -42,11 +49,14 @@ class RuleEvaluator(private val context: Context) {
 
         for (rule in rules) {
             if (!appliesToApp(rule, appPackage)) continue
-            if (!cooldownElapsed(rule, now)) continue
 
-            val matched = matches(rule, screenText)
-            if (matched) {
-                handleMatch(rule, appPackage, screenText, now)
+            val isMatching = matches(rule, screenText)
+            when {
+                isMatching && !rule.issueActive && cooldownElapsed(rule, now) ->
+                    deliverAlert(rule, appPackage, screenText, now, AlertEventType.ISSUE, newIssueActive = true)
+                !isMatching && rule.issueActive && cooldownElapsed(rule, now) ->
+                    deliverAlert(rule, appPackage, screenText, now, AlertEventType.RESOLVED, newIssueActive = false)
+                else -> {}
             }
         }
     }
@@ -73,38 +83,53 @@ class RuleEvaluator(private val context: Context) {
         }
     }
 
-    private suspend fun handleMatch(
+    /**
+     * Delivers a state transition (ISSUE or RESOLVED) for [rule]: updates its issue state,
+     * shows the local notification and/or sends the Mailjet e-mail per the rule's configured
+     * channels, and logs exactly one [AlertLogEntry].
+     *
+     * Runs inside [NonCancellable] because this is called from a coroutine job that the
+     * accessibility service may cancel (it cancels the in-flight evaluation job whenever a new
+     * screen-change event arrives, which can easily happen mid-flight during the Mailjet HTTPS
+     * call). Once we've decided this is a real transition worth notifying about, delivery must
+     * run to completion regardless.
+     */
+    private suspend fun deliverAlert(
         rule: KeywordRule,
         appPackage: String,
         screenText: String,
-        now: Long
-    ) {
+        now: Long,
+        eventType: AlertEventType,
+        newIssueActive: Boolean
+    ) = withContext(NonCancellable) {
         val snippet = buildSnippet(screenText, rule)
 
-        database.keywordRuleDao().updateLastTriggeredAt(rule.id, now)
-
-        var notifiedEmail = false
+        database.keywordRuleDao().updateIssueState(rule.id, newIssueActive, now)
 
         if (rule.notifyLocal) {
             NotificationHelper.showKeywordAlert(
-                context, rule.keyword, rule.matchMode, appPackage, snippet, rule.id
+                context, rule.keyword, eventType, appPackage, snippet, rule.id
             )
         }
 
+        var notifiedEmail = false
+        var emailError: String? = null
+
         if (rule.notifyEmail) {
             val settings = preferencesManager.getMailjetSettings()
-            val subjectRes = if (rule.matchMode == MatchMode.NOT_CONTAINS) {
-                R.string.alert_email_subject_not_found
+            val subjectRes = if (eventType == AlertEventType.RESOLVED) {
+                R.string.alert_email_subject_resolved
             } else {
-                R.string.alert_email_subject
+                R.string.alert_email_subject_issue
             }
             val result = mailSender.send(
                 settings = settings,
                 subject = context.getString(subjectRes, rule.keyword),
-                body = buildEmailBody(rule, appPackage, snippet, now)
+                body = buildEmailBody(rule, appPackage, snippet, now, eventType)
             )
             notifiedEmail = result is MailjetMailSender.Result.Success
             if (result is MailjetMailSender.Result.Failure) {
+                emailError = result.message
                 Log.w(TAG, "E-mail alert failed for rule ${rule.id}: ${result.message}")
             }
         }
@@ -117,7 +142,9 @@ class RuleEvaluator(private val context: Context) {
                 appPackage = appPackage,
                 textSnippet = snippet,
                 notifiedLocal = rule.notifyLocal,
-                notifiedEmail = notifiedEmail
+                notifiedEmail = notifiedEmail,
+                eventType = eventType,
+                emailError = emailError
             )
         )
     }
@@ -129,7 +156,7 @@ class RuleEvaluator(private val context: Context) {
         }
 
         val regex = buildKeywordRegex(rule.keyword, rule.caseSensitive)
-        val match = regex.find(screenText) ?: return screenText.take(maxLen)
+        val match = regex.find(screenText) ?: return screenText.take(maxLen).ifBlank { context.getString(R.string.log_snippet_no_text) }
 
         val contextRadius = 80
         // match.range.last is inclusive; for a zero-length match (e.g. a pattern consisting of
@@ -142,12 +169,18 @@ class RuleEvaluator(private val context: Context) {
         return (prefix + screenText.substring(start, end) + suffix).take(maxLen)
     }
 
-    private fun buildEmailBody(rule: KeywordRule, appPackage: String, snippet: String, timestamp: Long): String {
+    private fun buildEmailBody(
+        rule: KeywordRule,
+        appPackage: String,
+        snippet: String,
+        timestamp: Long,
+        eventType: AlertEventType
+    ): String {
         val formatter = SimpleDateFormat("dd-MM-yyyy HH:mm:ss", Locale.getDefault())
-        val introRes = if (rule.matchMode == MatchMode.NOT_CONTAINS) {
-            R.string.alert_email_intro_not_found
+        val introRes = if (eventType == AlertEventType.RESOLVED) {
+            R.string.alert_email_intro_resolved
         } else {
-            R.string.alert_email_intro
+            R.string.alert_email_intro_issue
         }
         return buildString {
             appendLine(context.getString(R.string.alert_email_device_name_label, DeviceInfoProvider.deviceName()))

@@ -5,10 +5,12 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
+import androidx.room.migration.Migration
+import androidx.sqlite.db.SupportSQLiteDatabase
 
 @Database(
     entities = [KeywordRule::class, AlertLogEntry::class],
-    version = 1,
+    version = 2,
     exportSchema = false
 )
 @TypeConverters(Converters::class)
@@ -27,7 +29,15 @@ abstract class AppDatabase : RoomDatabase() {
                     context.applicationContext,
                     AppDatabase::class.java,
                     "unetworkmonitor.db"
-                ).build().also { instance = it }
+                ).addMigrations(MIGRATION_1_2).build().also { instance = it }
+            }
+        }
+
+        private val MIGRATION_1_2 = object : Migration(1, 2) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("ALTER TABLE keyword_rules ADD COLUMN issueActive INTEGER NOT NULL DEFAULT 0")
+                db.execSQL("ALTER TABLE alert_log_entries ADD COLUMN eventType TEXT NOT NULL DEFAULT 'ISSUE'")
+                db.execSQL("ALTER TABLE alert_log_entries ADD COLUMN emailError TEXT")
             }
         }
     }

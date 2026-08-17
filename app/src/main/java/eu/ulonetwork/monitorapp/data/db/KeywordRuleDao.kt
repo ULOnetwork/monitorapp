@@ -29,6 +29,6 @@ interface KeywordRuleDao {
     @Delete
     suspend fun delete(rule: KeywordRule)
 
-    @Query("UPDATE keyword_rules SET lastTriggeredAt = :timestamp WHERE id = :ruleId")
-    suspend fun updateLastTriggeredAt(ruleId: Long, timestamp: Long)
+    @Query("UPDATE keyword_rules SET issueActive = :active, lastTriggeredAt = :timestamp WHERE id = :ruleId")
+    suspend fun updateIssueState(ruleId: Long, active: Boolean, timestamp: Long)
 }

@@ -8,4 +8,10 @@ class Converters {
 
     @TypeConverter
     fun toMatchMode(value: String): MatchMode = MatchMode.valueOf(value)
+
+    @TypeConverter
+    fun fromAlertEventType(type: AlertEventType): String = type.name
+
+    @TypeConverter
+    fun toAlertEventType(value: String): AlertEventType = AlertEventType.valueOf(value)
 }
