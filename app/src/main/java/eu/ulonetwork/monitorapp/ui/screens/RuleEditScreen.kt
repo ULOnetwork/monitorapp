@@ -57,6 +57,7 @@ fun RuleEditScreen(ruleId: Long, onDone: () -> Unit) {
     var notifyLocal by remember { mutableStateOf(true) }
     var notifyEmail by remember { mutableStateOf(false) }
     var appPackageFilter by remember { mutableStateOf("") }
+    var screenGateKeyword by remember { mutableStateOf("") }
     var cooldownMinutes by remember { mutableStateOf("10") }
     var showValidationError by remember { mutableStateOf(false) }
     var matchModeMenuExpanded by remember { mutableStateOf(false) }
@@ -73,6 +74,7 @@ fun RuleEditScreen(ruleId: Long, onDone: () -> Unit) {
                 notifyLocal = rule.notifyLocal
                 notifyEmail = rule.notifyEmail
                 appPackageFilter = rule.appPackageFilter ?: ""
+                screenGateKeyword = rule.screenGateKeyword ?: ""
                 cooldownMinutes = rule.cooldownMinutes.toString()
             }
         }
@@ -156,6 +158,15 @@ fun RuleEditScreen(ruleId: Long, onDone: () -> Unit) {
 
         Spacer(modifier = Modifier.height(12.dp))
         OutlinedTextField(
+            value = screenGateKeyword,
+            onValueChange = { screenGateKeyword = it },
+            label = { Text(stringResource(R.string.rule_screen_gate)) },
+            supportingText = { Text(stringResource(R.string.rule_screen_gate_hint)) },
+            modifier = Modifier.fillMaxWidth()
+        )
+
+        Spacer(modifier = Modifier.height(12.dp))
+        OutlinedTextField(
             value = cooldownMinutes,
             onValueChange = { cooldownMinutes = it.filter { c -> c.isDigit() } },
             label = { Text(stringResource(R.string.rule_cooldown)) },
@@ -196,11 +207,13 @@ fun RuleEditScreen(ruleId: Long, onDone: () -> Unit) {
                     showValidationError = false
 
                     val trimmedKeyword = keyword.trim()
+                    val trimmedScreenGate = screenGateKeyword.trim().ifBlank { null }
                     val conditionChanged = existingRule?.let {
                         it.keyword != trimmedKeyword ||
                             it.matchMode != matchMode ||
                             it.caseSensitive != caseSensitive ||
-                            it.appPackageFilter != trimmedFilter
+                            it.appPackageFilter != trimmedFilter ||
+                            it.screenGateKeyword != trimmedScreenGate
                     } ?: false
 
                     val rule = KeywordRule(
@@ -212,6 +225,7 @@ fun RuleEditScreen(ruleId: Long, onDone: () -> Unit) {
                         notifyLocal = notifyLocal,
                         notifyEmail = notifyEmail,
                         appPackageFilter = trimmedFilter,
+                        screenGateKeyword = trimmedScreenGate,
                         cooldownMinutes = cooldownMinutes.toIntOrNull() ?: 10,
                         lastTriggeredAt = if (conditionChanged) null else existingRule?.lastTriggeredAt,
                         issueActive = if (conditionChanged) false else existingRule?.issueActive ?: false

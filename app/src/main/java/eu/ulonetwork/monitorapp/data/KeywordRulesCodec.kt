@@ -29,6 +29,7 @@ object KeywordRulesCodec {
                 put("notifyLocal", rule.notifyLocal)
                 put("notifyEmail", rule.notifyEmail)
                 put("appPackageFilter", rule.appPackageFilter)
+                put("screenGateKeyword", rule.screenGateKeyword)
                 put("cooldownMinutes", rule.cooldownMinutes)
             }
             array.put(json)
@@ -62,6 +63,7 @@ object KeywordRulesCodec {
                     notifyLocal = json.optBoolean("notifyLocal", true),
                     notifyEmail = json.optBoolean("notifyEmail", false),
                     appPackageFilter = json.optString("appPackageFilter", "").ifBlank { null },
+                    screenGateKeyword = json.optString("screenGateKeyword", "").ifBlank { null },
                     cooldownMinutes = json.optInt("cooldownMinutes", 10),
                     lastTriggeredAt = null
                 )

@@ -10,7 +10,7 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 
 @Database(
     entities = [KeywordRule::class, AlertLogEntry::class],
-    version = 2,
+    version = 3,
     exportSchema = false
 )
 @TypeConverters(Converters::class)
@@ -29,7 +29,7 @@ abstract class AppDatabase : RoomDatabase() {
                     context.applicationContext,
                     AppDatabase::class.java,
                     "unetworkmonitor.db"
-                ).addMigrations(MIGRATION_1_2).build().also { instance = it }
+                ).addMigrations(MIGRATION_1_2, MIGRATION_2_3).build().also { instance = it }
             }
         }
 
@@ -38,6 +38,12 @@ abstract class AppDatabase : RoomDatabase() {
                 db.execSQL("ALTER TABLE keyword_rules ADD COLUMN issueActive INTEGER NOT NULL DEFAULT 0")
                 db.execSQL("ALTER TABLE alert_log_entries ADD COLUMN eventType TEXT NOT NULL DEFAULT 'ISSUE'")
                 db.execSQL("ALTER TABLE alert_log_entries ADD COLUMN emailError TEXT")
+            }
+        }
+
+        private val MIGRATION_2_3 = object : Migration(2, 3) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("ALTER TABLE keyword_rules ADD COLUMN screenGateKeyword TEXT")
             }
         }
     }

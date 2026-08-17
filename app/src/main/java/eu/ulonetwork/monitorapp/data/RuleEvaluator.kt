@@ -24,10 +24,12 @@ import java.util.concurrent.TimeUnit
  * Evaluates [KeywordRule]s against text extracted from the screen by the accessibility service,
  * logs matches and fires the configured alert channels.
  *
- * Alerting is edge-triggered: a rule only notifies when its condition transitions from not
- * matching to matching (ISSUE) or back from matching to not matching (RESOLVED), not on every
- * evaluation where the condition happens to hold. [KeywordRule.issueActive] tracks which side of
- * that transition a rule is currently on.
+ * A rule's [matches] result represents whether its configured condition currently holds, already
+ * accounting for CONTAINS vs. NOT_CONTAINS — `true` always means "as expected" (for CONTAINS: the
+ * keyword is present; for NOT_CONTAINS: the keyword is absent). Alerting is edge-triggered off
+ * that: a rule notifies ISSUE when the condition stops holding, stays silent while it remains
+ * broken, and notifies RESOLVED when it holds again — never a RESOLVED without a preceding ISSUE.
+ * [KeywordRule.issueActive] tracks which side of that transition a rule is currently on.
  */
 class RuleEvaluator(private val context: Context) {
 
@@ -49,12 +51,13 @@ class RuleEvaluator(private val context: Context) {
 
         for (rule in rules) {
             if (!appliesToApp(rule, appPackage)) continue
+            if (!screenGateOpen(rule, screenText)) continue
 
             val isMatching = matches(rule, screenText)
             when {
-                isMatching && !rule.issueActive && cooldownElapsed(rule, now) ->
+                !isMatching && !rule.issueActive && cooldownElapsed(rule, now) ->
                     deliverAlert(rule, appPackage, screenText, now, AlertEventType.ISSUE, newIssueActive = true)
-                !isMatching && rule.issueActive && cooldownElapsed(rule, now) ->
+                isMatching && rule.issueActive && cooldownElapsed(rule, now) ->
                     deliverAlert(rule, appPackage, screenText, now, AlertEventType.RESOLVED, newIssueActive = false)
                 else -> {}
             }
@@ -64,6 +67,20 @@ class RuleEvaluator(private val context: Context) {
     private fun appliesToApp(rule: KeywordRule, appPackage: String): Boolean {
         val filter = rule.appPackageFilter
         return filter.isNullOrBlank() || filter == appPackage
+    }
+
+    /**
+     * Whether [rule] should be evaluated at all on the current screen. Without this gate, a rule
+     * scoped only by [KeywordRule.appPackageFilter] would be checked against every screen inside
+     * that app, including screens that never contain [KeywordRule.keyword] at all — misreading
+     * "user navigated elsewhere in the app" as a real ISSUE/RESOLVED transition. When
+     * [KeywordRule.screenGateKeyword] is set, the rule is only evaluated on screens where that
+     * pattern is present; otherwise every screen of the matched app is evaluated, as before.
+     */
+    private fun screenGateOpen(rule: KeywordRule, screenText: String): Boolean {
+        val gateKeyword = rule.screenGateKeyword
+        if (gateKeyword.isNullOrBlank()) return true
+        return buildKeywordRegex(gateKeyword, rule.caseSensitive).containsMatchIn(screenText)
     }
 
     private fun cooldownElapsed(rule: KeywordRule, now: Long): Boolean {

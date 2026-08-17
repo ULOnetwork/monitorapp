@@ -43,6 +43,8 @@
     <string name="rule_notify_email">E-mail melding</string>
     <string name="rule_app_filter">App-pakket filter (optioneel)</string>
     <string name="rule_app_filter_hint">bijv. com.whatsapp — leeg = alle apps</string>
+    <string name="rule_screen_gate">Scherm-herkenningstekst (optioneel)</string>
+    <string name="rule_screen_gate_hint">Tekst die eerst zichtbaar moet zijn op het scherm voordat deze regel überhaupt gecontroleerd wordt. Voorkomt onterechte ISSUE/RESOLVED-meldingen bij het wisselen naar andere schermen binnen dezelfde app. Zelfde jokertekens als bij Trefwoord.</string>
     <string name="rule_cooldown">Afkoelperiode (minuten)</string>
     <string name="rule_not_contains_requires_app">\"Bevat NIET\"-regels vereisen een specifiek app-pakket, anders zou elk ander scherm ten onrechte overeenkomen.</string>
     <string name="rule_save">Opslaan</string>

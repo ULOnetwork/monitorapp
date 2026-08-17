@@ -183,25 +183,35 @@ herbouwwerkzaamheden.
   knoppen om deze te activeren.
 - **Trefwoorden**: lijst van regels (`KeywordRule`) met toevoegen/bewerken/verwijderen. Elke regel
   heeft een trefwoord, overeenkomstmodus (Bevat / Bevat NIET), hoofdlettergevoeligheid,
-  aan/uit-schakelaar, meldingskanalen (lokaal/e-mail), optioneel app-pakketfilter en een
-  afkoelperiode in minuten. "Bevat NIET"-regels vereisen een specifiek app-pakket. Een trefwoord
-  mag eenvoudige jokertekens bevatten: `*` voor een willekeurige reeks tekens (ook geen) en `?`
-  voor precies één teken — bijvoorbeeld `koop*bitcoin` vindt ook "koop nu snel bitcoin". Een
-  trefwoord zonder jokertekens werkt zoals voorheen als gewone tekstovereenkomst. Wildcards matchen
-  ook over regeleinden heen, zodat een patroon als `Attestation*Hardware-verified` ook matcht als
-  de twee delen als aparte tekstelementen op het scherm staan. De hele lijst met regels kan via een
-  kopieerbare code worden overgezet naar andere apparaten (regels worden bij import toegevoegd, niet
-  overschreven).
-- **ISSUE/RESOLVED-meldingen**: een regel meldt zich niet meer bij elke afzonderlijke controle
-  waarin de voorwaarde geldt, maar alleen bij een statusovergang. Zodra de voorwaarde van een
-  regel voor het eerst waar wordt, komt er één ISSUE-melding (lokaal en/of e-mail, afhankelijk van
-  de kanalen die voor die regel zijn ingeschakeld). Zolang de voorwaarde blijft gelden, wordt er
-  stil doorgecontroleerd zonder nieuwe meldingen. Pas zodra de voorwaarde weer niet meer geldt komt
-  er één RESOLVED-melding. De afkoelperiode van de regel geldt als minimale tijd tussen zulke
-  statusovergangen, in beide richtingen. Deze status (`issueActive`) wordt per regel onthouden;
-  bij het bewerken van een bestaande regel wordt de status gereset zodra de trefwoord-voorwaarde
-  zelf verandert (trefwoord, overeenkomstmodus, hoofdlettergevoeligheid of app-pakketfilter), maar
-  blijft behouden als alleen kanalen/afkoelperiode/aan-uit worden aangepast.
+  aan/uit-schakelaar, meldingskanalen (lokaal/e-mail), optioneel app-pakketfilter, optionele
+  scherm-herkenningstekst en een afkoelperiode in minuten. "Bevat NIET"-regels vereisen een
+  specifiek app-pakket. Een trefwoord mag eenvoudige jokertekens bevatten: `*` voor een
+  willekeurige reeks tekens (ook geen) en `?` voor precies één teken — bijvoorbeeld `koop*bitcoin`
+  vindt ook "koop nu snel bitcoin". Een trefwoord zonder jokertekens werkt zoals voorheen als
+  gewone tekstovereenkomst. Wildcards matchen ook over regeleinden heen, zodat een patroon als
+  `Attestation*Hardware-verified` ook matcht als de twee delen als aparte tekstelementen op het
+  scherm staan. De hele lijst met regels kan via een kopieerbare code worden overgezet naar andere
+  apparaten (regels worden bij import toegevoegd, niet overschreven).
+- **Scherm-herkenningstekst**: een tweede, optioneel trefwoord per regel (zelfde jokertekens) dat
+  eerst op het scherm aanwezig moet zijn voordat de eigenlijke Bevat/Bevat-NIET-controle van die
+  regel wordt uitgevoerd. Het app-pakketfilter scopet een regel tot één app, maar niet tot een
+  specifiek scherm daarbinnen — zonder deze herkenningstekst zou wisselen naar een ander scherm in
+  dezelfde app (waar het trefwoord toevallig ook niet voorkomt) ten onrechte als een ISSUE- of
+  RESOLVED-overgang gezien worden. Staat de herkenningstekst niet op het huidige scherm, dan wordt
+  de regel dat moment overgeslagen en blijft zijn status ongewijzigd.
+- **ISSUE/RESOLVED-meldingen**: een regel meldt zich niet meer bij elke afzonderlijke controle,
+  maar alleen bij een statusovergang. Elke regel definieert met zijn overeenkomstmodus wat de
+  normale/verwachte toestand is (bij "Bevat": trefwoord aanwezig; bij "Bevat NIET": trefwoord
+  afwezig). Zodra die verwachte toestand niet meer klopt, komt er één ISSUE-melding (lokaal en/of
+  e-mail, afhankelijk van de kanalen die voor die regel zijn ingeschakeld). Zolang de afwijking
+  blijft bestaan, wordt er stil doorgecontroleerd zonder nieuwe meldingen. Pas zodra de verwachte
+  toestand weer klopt komt er één RESOLVED-melding — en nooit een RESOLVED-melding zonder dat er
+  eerst een ISSUE geregistreerd was. De afkoelperiode van de regel geldt als minimale tijd tussen
+  zulke statusovergangen, in beide richtingen. Deze status (`issueActive`) wordt per regel
+  onthouden; bij het bewerken van een bestaande regel wordt de status gereset zodra de
+  trefwoord-voorwaarde zelf verandert (trefwoord, overeenkomstmodus, hoofdlettergevoeligheid,
+  app-pakketfilter of scherm-herkenningstekst), maar blijft behouden als alleen
+  kanalen/afkoelperiode/aan-uit worden aangepast.
 - **Betrouwbaardere e-maillevering**: het versturen van de alert-e-mail en het wegschrijven van de
   logregel kunnen niet langer stilletjes worden afgebroken doordat het scherm tijdens het versturen
   van de e-mail (tot 15 seconden) opnieuw wijzigt. Als het versturen van een e-mail toch mislukt
