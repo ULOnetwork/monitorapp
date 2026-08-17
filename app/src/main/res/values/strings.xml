@@ -108,8 +108,8 @@
 
     <string name="alert_email_subject_issue">UnetworkMonitor: ISSUE — \"%1$s\"</string>
     <string name="alert_email_subject_resolved">UnetworkMonitor: RESOLVED — \"%1$s\"</string>
-    <string name="alert_email_intro_issue">UnetworkMonitor detected that this rule\'s condition is now matching.</string>
-    <string name="alert_email_intro_resolved">UnetworkMonitor detected that this rule\'s condition is no longer matching.</string>
+    <string name="alert_email_intro_issue">UnetworkMonitor detected that this rule\'s condition is no longer being met.</string>
+    <string name="alert_email_intro_resolved">UnetworkMonitor detected that this rule\'s condition is being met again.</string>
     <string name="alert_email_device_name_label">Device name: %1$s</string>
     <string name="alert_email_device_id_label">Device ID: %1$s</string>
     <string name="alert_email_ip_label">IP address: %1$s</string>
