@@ -47,6 +47,7 @@
     <string name="rule_screen_gate">Screen recognition text (optional)</string>
     <string name="rule_screen_gate_hint">Text that must be visible on screen before this rule is checked at all. Prevents false ISSUE/RESOLVED alerts when navigating to other screens within the same app. Same wildcard syntax as Keyword.</string>
     <string name="rule_cooldown">Cooldown period (minutes)</string>
+    <string name="rule_cooldown_hint">Only delays a new ISSUE alert after a flapping condition recovers and breaks again. A RESOLVED alert is never delayed.</string>
     <string name="rule_not_contains_requires_app">\"Does NOT contain\" rules require a specific app package, otherwise every other screen would match incorrectly.</string>
     <string name="rule_save">Save</string>
     <string name="rule_delete">Delete</string>

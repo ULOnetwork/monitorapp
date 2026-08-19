@@ -172,6 +172,7 @@ fun RuleEditScreen(ruleId: Long, onDone: () -> Unit) {
             value = cooldownMinutes,
             onValueChange = { cooldownMinutes = it.filter { c -> c.isDigit() } },
             label = { Text(stringResource(R.string.rule_cooldown)) },
+            supportingText = { Text(stringResource(R.string.rule_cooldown_hint)) },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
             modifier = Modifier.fillMaxWidth()
         )

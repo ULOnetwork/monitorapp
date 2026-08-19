@@ -252,8 +252,11 @@ herbouwwerkzaamheden.
   e-mail, afhankelijk van de kanalen die voor die regel zijn ingeschakeld). Zolang de afwijking
   blijft bestaan, wordt er stil doorgecontroleerd zonder nieuwe meldingen. Pas zodra de verwachte
   toestand weer klopt komt er één RESOLVED-melding — en nooit een RESOLVED-melding zonder dat er
-  eerst een ISSUE geregistreerd was. De afkoelperiode van de regel geldt als minimale tijd tussen
-  zulke statusovergangen, in beide richtingen. Deze status (`issueActive`) wordt per regel
+  eerst een ISSUE geregistreerd was. Een RESOLVED-melding wordt nooit vertraagd: zodra de verwachte
+  toestand weer klopt, wordt dat direct gemeld. De afkoelperiode van de regel geldt alleen als
+  minimale tijd voordat een nieuwe ISSUE weer mag afgaan nadat de vorige is opgelost — dit voorkomt
+  een stortvloed aan meldingen bij een snel "flapperende" situatie (bijv. een verbinding die
+  meerdere keren per minuut wegvalt en terugkomt). Deze status (`issueActive`) wordt per regel
   onthouden; bij het bewerken van een bestaande regel wordt de status gereset zodra de
   trefwoord-voorwaarde zelf verandert (trefwoord, overeenkomstmodus, hoofdlettergevoeligheid,
   app-pakketfilter of scherm-herkenningstekst), maar blijft behouden als alleen

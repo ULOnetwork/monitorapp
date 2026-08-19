@@ -71,7 +71,10 @@ class RuleEvaluator(private val context: Context) {
             when {
                 !isMatching && !rule.issueActive && cooldownElapsed(rule, now) ->
                     deliverAlert(rule, appPackage, screenText, now, AlertEventType.ISSUE, newIssueActive = true)
-                isMatching && rule.issueActive && cooldownElapsed(rule, now) ->
+                // RESOLVED is never cooldown-gated: once the user already knows about an ISSUE,
+                // telling them it's over is never "too soon", and there can be at most one
+                // RESOLVED per ISSUE anyway (it's not something that needs rate-limiting).
+                isMatching && rule.issueActive ->
                     deliverAlert(rule, appPackage, screenText, now, AlertEventType.RESOLVED, newIssueActive = false)
                 else -> {}
             }
@@ -97,6 +100,12 @@ class RuleEvaluator(private val context: Context) {
         return buildKeywordRegex(gateKeyword, rule.caseSensitive).containsMatchIn(screenText)
     }
 
+    /**
+     * Whether enough time has passed since [rule]'s last state transition (ISSUE or RESOLVED) to
+     * allow a new ISSUE to fire. This only gates re-arming after a RESOLVED — it exists to stop a
+     * rapidly flapping condition (e.g. a connection dropping and recovering every few seconds)
+     * from firing an ISSUE/RESOLVED pair on every flap. RESOLVED itself is never gated by this.
+     */
     private fun cooldownElapsed(rule: KeywordRule, now: Long): Boolean {
         val last = rule.lastTriggeredAt ?: return true
         val cooldownMillis = TimeUnit.MINUTES.toMillis(rule.cooldownMinutes.toLong())

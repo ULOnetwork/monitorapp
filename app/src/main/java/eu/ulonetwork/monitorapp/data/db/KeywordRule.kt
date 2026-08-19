@@ -27,6 +27,11 @@ data class KeywordRule(
      * real match/non-match.
      */
     val screenGateKeyword: String? = null,
+    /**
+     * Minimum time since this rule's last state transition before a new ISSUE may fire again,
+     * guarding against a rapidly flapping condition triggering an alert on every flap. Does NOT
+     * delay RESOLVED — that always fires immediately once a known ISSUE clears.
+     */
     val cooldownMinutes: Int = 10,
     val lastTriggeredAt: Long? = null,
     /** Whether the rule's condition currently fails to hold (an ISSUE alert has fired and no RESOLVED alert has fired since). */
