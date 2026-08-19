@@ -9,6 +9,7 @@ import eu.ulonetwork.monitorapp.data.db.AppDatabase
 import eu.ulonetwork.monitorapp.data.db.KeywordRule
 import eu.ulonetwork.monitorapp.data.db.MatchMode
 import eu.ulonetwork.monitorapp.mail.MailjetMailSender
+import eu.ulonetwork.monitorapp.telegram.TelegramSender
 import eu.ulonetwork.monitorapp.util.DeviceInfoProvider
 import eu.ulonetwork.monitorapp.util.NotificationHelper
 import eu.ulonetwork.monitorapp.util.buildKeywordRegex
@@ -36,6 +37,7 @@ class RuleEvaluator(private val context: Context) {
     private val database = AppDatabase.getInstance(context)
     private val preferencesManager = PreferencesManager(context)
     private val mailSender = MailjetMailSender()
+    private val telegramSender = TelegramSender()
 
     /**
      * Evaluates all enabled rules against [screenText] observed while [appPackage] is in the
@@ -163,6 +165,22 @@ class RuleEvaluator(private val context: Context) {
             }
         }
 
+        var notifiedTelegram = false
+        var telegramError: String? = null
+
+        if (rule.notifyTelegram) {
+            val settings = preferencesManager.getTelegramSettings()
+            val result = telegramSender.send(
+                settings = settings,
+                text = buildTelegramMessage(rule, appPackage, snippet, now, eventType)
+            )
+            notifiedTelegram = result is TelegramSender.Result.Success
+            if (result is TelegramSender.Result.Failure) {
+                telegramError = result.message
+                Log.w(TAG, "Telegram alert failed for rule ${rule.id}: ${result.message}")
+            }
+        }
+
         database.alertLogDao().insert(
             AlertLogEntry(
                 timestamp = now,
@@ -172,8 +190,10 @@ class RuleEvaluator(private val context: Context) {
                 textSnippet = snippet,
                 notifiedLocal = rule.notifyLocal,
                 notifiedEmail = notifiedEmail,
+                notifiedTelegram = notifiedTelegram,
                 eventType = eventType,
-                emailError = emailError
+                emailError = emailError,
+                telegramError = telegramError
             )
         )
     }
@@ -214,6 +234,34 @@ class RuleEvaluator(private val context: Context) {
         return buildString {
             appendLine(context.getString(R.string.alert_email_device_name_label, DeviceInfoProvider.deviceName()))
             appendLine(context.getString(R.string.alert_email_device_id_label, DeviceInfoProvider.deviceIdentifier(context)))
+            appendLine(context.getString(R.string.alert_email_ip_label, DeviceInfoProvider.localIpAddress()))
+            appendLine()
+            appendLine(context.getString(introRes))
+            appendLine()
+            appendLine(context.getString(R.string.alert_email_keyword_label, rule.keyword))
+            appendLine(context.getString(R.string.alert_email_app_label, appPackage))
+            appendLine(context.getString(R.string.alert_email_time_label, formatter.format(Date(timestamp))))
+            appendLine()
+            appendLine(context.getString(R.string.alert_email_fragment_label))
+            appendLine(snippet)
+        }
+    }
+
+    private fun buildTelegramMessage(
+        rule: KeywordRule,
+        appPackage: String,
+        snippet: String,
+        timestamp: Long,
+        eventType: AlertEventType
+    ): String {
+        val formatter = SimpleDateFormat("dd-MM-yyyy HH:mm:ss", Locale.getDefault())
+        val introRes = if (eventType == AlertEventType.RESOLVED) {
+            R.string.alert_email_intro_resolved
+        } else {
+            R.string.alert_email_intro_issue
+        }
+        return buildString {
+            appendLine(context.getString(R.string.alert_email_device_name_label, DeviceInfoProvider.deviceName()))
             appendLine(context.getString(R.string.alert_email_ip_label, DeviceInfoProvider.localIpAddress()))
             appendLine()
             appendLine(context.getString(introRes))

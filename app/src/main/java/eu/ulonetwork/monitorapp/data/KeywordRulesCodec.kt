@@ -28,6 +28,7 @@ object KeywordRulesCodec {
                 put("enabled", rule.enabled)
                 put("notifyLocal", rule.notifyLocal)
                 put("notifyEmail", rule.notifyEmail)
+                put("notifyTelegram", rule.notifyTelegram)
                 put("appPackageFilter", rule.appPackageFilter)
                 put("screenGateKeyword", rule.screenGateKeyword)
                 put("cooldownMinutes", rule.cooldownMinutes)
@@ -62,6 +63,7 @@ object KeywordRulesCodec {
                     enabled = json.optBoolean("enabled", true),
                     notifyLocal = json.optBoolean("notifyLocal", true),
                     notifyEmail = json.optBoolean("notifyEmail", false),
+                    notifyTelegram = json.optBoolean("notifyTelegram", false),
                     appPackageFilter = json.optString("appPackageFilter", "").ifBlank { null },
                     screenGateKeyword = json.optString("screenGateKeyword", "").ifBlank { null },
                     cooldownMinutes = json.optInt("cooldownMinutes", 10),

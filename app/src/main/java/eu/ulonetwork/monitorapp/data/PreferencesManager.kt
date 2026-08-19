@@ -61,6 +61,22 @@ class PreferencesManager(context: Context) {
             .apply()
     }
 
+    // --- Telegram settings ---
+
+    fun getTelegramSettings(): TelegramSettings {
+        return TelegramSettings(
+            botToken = encryptedPrefs.getString(KEY_TELEGRAM_BOT_TOKEN, "") ?: "",
+            chatId = encryptedPrefs.getString(KEY_TELEGRAM_CHAT_ID, "") ?: ""
+        )
+    }
+
+    fun saveTelegramSettings(settings: TelegramSettings) {
+        encryptedPrefs.edit()
+            .putString(KEY_TELEGRAM_BOT_TOKEN, settings.botToken)
+            .putString(KEY_TELEGRAM_CHAT_ID, settings.chatId)
+            .apply()
+    }
+
     companion object {
         private const val PLAIN_PREFS_NAME = "unetworkmonitor_prefs"
         private const val ENCRYPTED_PREFS_NAME = "unetworkmonitor_secure_prefs"
@@ -72,5 +88,8 @@ class PreferencesManager(context: Context) {
         private const val KEY_MAILJET_FROM_ADDRESS = "mailjet_from_address"
         private const val KEY_MAILJET_FROM_NAME = "mailjet_from_name"
         private const val KEY_MAILJET_TO_ADDRESS = "mailjet_to_address"
+
+        private const val KEY_TELEGRAM_BOT_TOKEN = "telegram_bot_token"
+        private const val KEY_TELEGRAM_CHAT_ID = "telegram_chat_id"
     }
 }

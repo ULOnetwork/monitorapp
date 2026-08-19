@@ -77,15 +77,24 @@ private fun LogRow(entry: AlertLogEntry) {
             Spacer(modifier = Modifier.height(4.dp))
             val notificationChannelLabel = stringResource(R.string.log_channel_notification)
             val emailChannelLabel = stringResource(R.string.log_channel_email)
+            val telegramChannelLabel = stringResource(R.string.log_channel_telegram)
             val noneLabel = stringResource(R.string.log_channel_none)
             val channels = buildList {
                 if (entry.notifiedLocal) add(notificationChannelLabel)
                 if (entry.notifiedEmail) add(emailChannelLabel)
+                if (entry.notifiedTelegram) add(telegramChannelLabel)
             }.joinToString(", ").ifBlank { noneLabel }
             Text(text = stringResource(R.string.log_channels_label, channels), style = MaterialTheme.typography.bodySmall)
             if (entry.emailError != null) {
                 Text(
                     text = stringResource(R.string.log_email_error, entry.emailError),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.error
+                )
+            }
+            if (entry.telegramError != null) {
+                Text(
+                    text = stringResource(R.string.log_telegram_error, entry.telegramError),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.error
                 )

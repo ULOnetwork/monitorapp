@@ -6,7 +6,7 @@
     <string name="nav_status">Status</string>
     <string name="nav_rules">Trefwoorden</string>
     <string name="nav_log">Meldingenlog</string>
-    <string name="nav_settings">E-mail instellingen</string>
+    <string name="nav_settings">Meldingen</string>
 
     <string name="consent_title">Voordat je verdergaat</string>
     <string name="consent_body">UnetworkMonitor gebruikt een Toegankelijkheidsservice (Accessibility Service) om de tekst te lezen die zichtbaar is op het scherm, in alle apps die op dit apparaat worden gebruikt. Deze tekst wordt vergeleken met een lijst trefwoorden die jij zelf instelt. Bij een match kan de app een lokale melding tonen en/of een e-mail versturen.\n\nInstalleer en gebruik deze app alleen op een apparaat dat je zelf bezit, of waarvoor je uitdrukkelijke toestemming hebt van de eigenaar/gebruiker om het te monitoren. Het lezen van schermtekst zonder toestemming van de gebruiker van het apparaat kan in strijd zijn met wet- en regelgeving rond privacy.\n\nDe app is altijd zichtbaar in de app-lijst met het normale icoon en de normale naam \"UnetworkMonitor\" en verbergt zichzelf nooit.</string>
@@ -41,6 +41,7 @@
     <string name="rule_enabled">Ingeschakeld</string>
     <string name="rule_notify_local">Lokale melding</string>
     <string name="rule_notify_email">E-mail melding</string>
+    <string name="rule_notify_telegram">Telegram-melding</string>
     <string name="rule_app_filter">App-pakket filter (optioneel)</string>
     <string name="rule_app_filter_hint">bijv. com.whatsapp — leeg = alle apps</string>
     <string name="rule_screen_gate">Scherm-herkenningstekst (optioneel)</string>
@@ -63,9 +64,11 @@
     <string name="log_channels_label">Kanalen: %1$s</string>
     <string name="log_channel_notification">melding</string>
     <string name="log_channel_email">e-mail</string>
+    <string name="log_channel_telegram">Telegram</string>
     <string name="log_channel_none">geen</string>
     <string name="log_snippet_no_text">(Geen tekst gevonden op het scherm)</string>
     <string name="log_email_error">E-mailfout: %1$s</string>
+    <string name="log_telegram_error">Telegramfout: %1$s</string>
 
     <string name="settings_title">E-mail instellingen (Mailjet)</string>
     <string name="settings_explanation">E-mailmeldingen worden verstuurd via de Mailjet API over HTTPS (niet via SMTP), omdat SMTP-poorten vaak geblokkeerd worden door netwerkfirewalls. Zie de README voor het aanmaken van een Mailjet-account en waar je deze waarden vindt.</string>
@@ -95,6 +98,17 @@
     <string name="settings_import_button">Importeren</string>
     <string name="settings_import_success">Instellingen geïmporteerd — vergeet niet op Opslaan te tikken</string>
     <string name="settings_import_invalid">Dit lijkt geen geldige instellingencode</string>
+
+    <string name="settings_telegram_title">Telegram-instellingen</string>
+    <string name="settings_telegram_explanation">Telegram-meldingen worden verstuurd via een Telegram-bot. 1) Stuur een bericht naar @BotFather op Telegram, stuur /newbot en volg de stappen om een bot-token te krijgen. 2) Stuur een willekeurig bericht naar je nieuwe bot, open daarna https://api.telegram.org/bot&lt;token&gt;/getUpdates in een browser (vervang &lt;token&gt;) om je chat-ID te vinden in de respons (\"chat\":{\"id\":…}). Zie de README voor een stap-voor-stap uitleg.</string>
+    <string name="settings_telegram_bot_token">Bot-token</string>
+    <string name="settings_telegram_bot_token_hint">Van @BotFather na het aanmaken van je bot — behandel dit als een wachtwoord</string>
+    <string name="settings_telegram_chat_id">Chat-ID</string>
+    <string name="settings_telegram_chat_id_hint">Je eigen chat-ID, of een groeps-/kanaal-ID als je meldingen daar wilt ontvangen</string>
+    <string name="settings_telegram_test">Testbericht versturen</string>
+    <string name="settings_telegram_test_message">Dit is een testbericht vanuit de UnetworkMonitor app. Als je dit ontvangt, werken de Telegram-instellingen correct.</string>
+    <string name="settings_telegram_transfer_explanation">Genereer hieronder een code om deze Telegram-configuratie naar een ander apparaat te kopiëren, of plak een code die op een ander apparaat is gegenereerd om ze hier te importeren. De code bevat je bot-token in decodeerbare vorm, behandel de code dus als een wachtwoord.</string>
+    <string name="settings_telegram_import_placeholder">UMTG1:…</string>
 
     <string name="settings_language_section">Language / Taal</string>
     <string name="language_option_english">English</string>

@@ -2,8 +2,8 @@
 
 UnetworkMonitor is een native Android-app (Kotlin, Jetpack Compose) die via een
 Toegankelijkheidsservice (Accessibility Service) de tekst leest die zichtbaar is op het scherm,
-deze vergelijkt met een lijst zelf ingestelde trefwoorden, en bij een match een lokale melding
-en/of e-mail stuurt.
+deze vergelijkt met een lijst zelf ingestelde trefwoorden, en bij een match een lokale melding,
+e-mail en/of Telegram-bericht stuurt.
 
 Deze app wordt **niet** gepubliceerd op de Play Store. Hij is uitsluitend bedoeld om via `adb
 install` te sideloaden op een apparaat.
@@ -102,7 +102,7 @@ via SMTP.
 
 ### Instellingen invullen in de app
 
-Ga naar het tabblad "E-mail instellingen" en vul de volgende velden in:
+Ga naar het tabblad "Meldingen" en vul de volgende velden in:
 
 | Veld | Omschrijving |
 |---|---|
@@ -121,7 +121,7 @@ dus versleuteld en nooit in platte tekst.
 
 ### Instellingen overzetten naar een ander apparaat
 
-Onderaan het "E-mail instellingen"-scherm staat een sectie om deze Mailjet-configuratie tussen je
+Onderaan de Mailjet-sectie op het "Meldingen"-scherm staat een sectie om deze Mailjet-configuratie tussen je
 eigen apparaten over te zetten zonder de API Key en Secret Key opnieuw over te typen:
 
 1. Tik op het ene apparaat op **"Genereer code (kopieert naar klembord)"**. Dit zet een code met
@@ -149,7 +149,53 @@ omdat dit een debug-build is). Kopieer de output (inclusief het `UMJMAIL1:`-voor
 'm als een wachtwoord — deel 'm niet via chat-apps of notities die naar derden gesynchroniseerd
 worden.
 
-## 6. Trefwoordregels overzetten naar een ander apparaat
+## 6. Telegram-instellingen invullen (voor Telegram-meldingen)
+
+Naast e-mail kan een regel ook een melding sturen naar een Telegram-chat via een eigen Telegram-bot.
+
+### Een Telegram-bot aanmaken
+
+1. Open Telegram en start een gesprek met **@BotFather** (de officiële Telegram-bot om andere bots
+   te beheren).
+2. Stuur het commando `/newbot` en volg de instructies (naam en gebruikersnaam voor de bot kiezen).
+3. BotFather stuurt daarna een **bot-token** terug (ziet eruit als `123456789:AAExampleTokenHere`).
+   Bewaar dit — dit is de enige keer dat je het zo te zien krijgt.
+
+### Je chat-ID vinden
+
+1. Stuur een willekeurig bericht (bijv. "hoi") naar je nieuwe bot in Telegram — dit moet je zelf
+   doen, een bot kan niet als eerste een gesprek starten.
+2. Open in een browser de volgende URL, met je eigen token ingevuld:
+   `https://api.telegram.org/bot<JOUW_TOKEN>/getUpdates`
+3. In de JSON-respons staat ergens `"chat":{"id":123456789, ...}` — dat getal (kan ook negatief
+   zijn, bijv. bij een groep) is je **chat-ID**.
+
+Wil je meldingen in een groep of kanaal in plaats van een privégesprek? Voeg de bot toe aan die
+groep/dat kanaal en herhaal bovenstaande stappen (stuur eerst een bericht in de groep) om de
+groeps-/kanaal-chat-ID te vinden.
+
+### Instellingen invullen in de app
+
+Ga naar het tabblad "Meldingen" en scrol naar de sectie "Telegram-instellingen":
+
+| Veld | Omschrijving |
+|---|---|
+| Bot-token | De token die je van @BotFather kreeg — behandel dit als een wachtwoord |
+| Chat-ID | Het ID dat je hierboven hebt gevonden |
+
+Tik op "Instellingen opslaan" en gebruik daarna "Testbericht versturen" om te controleren of alles
+correct is ingesteld. Het bot-token wordt op het toestel opgeslagen met `EncryptedSharedPreferences`,
+dus versleuteld en nooit in platte tekst.
+
+Net als bij de Mailjet-instellingen staat onderaan deze sectie een export/import-functionaliteit om
+de Telegram-configuratie tussen je eigen apparaten over te zetten (code met voorvoegsel `UMTG1:`,
+zelfde klembord-fallback via `adb shell run-as eu.ulonetwork.monitorapp cat files/telegram-export.txt`
+als bij Mailjet).
+
+Zet tot slot per regel de schakelaar "Telegram-melding" aan (in het bewerkscherm van die regel) om
+Telegram daadwerkelijk als meldingskanaal te gebruiken.
+
+## 7. Trefwoordregels overzetten naar een ander apparaat
 
 Onderaan het "Trefwoorden"-scherm staat dezelfde export/import-functionaliteit als bij de
 Mailjet-instellingen, maar dan voor de hele lijst met trefwoordregels:
@@ -167,7 +213,7 @@ nieuwe regels — het overschrijft of verwijdert nooit bestaande regels op het o
 Dezelfde code twee keer importeren levert dus duplicaten op; verwijder die in dat geval handmatig
 in de lijst.
 
-## 7. Taal van de app
+## 8. Taal van de app
 
 De app toont voorlopig altijd **Engels**, ongeacht de systeemtaal van het toestel. Er is voor nu
 geen taalkeuze zichtbaar in de app. Onder de motorkap zijn de Nederlandse vertalingen en de
@@ -183,7 +229,7 @@ herbouwwerkzaamheden.
   knoppen om deze te activeren.
 - **Trefwoorden**: lijst van regels (`KeywordRule`) met toevoegen/bewerken/verwijderen. Elke regel
   heeft een trefwoord, overeenkomstmodus (Bevat / Bevat NIET), hoofdlettergevoeligheid,
-  aan/uit-schakelaar, meldingskanalen (lokaal/e-mail), optioneel app-pakketfilter, optionele
+  aan/uit-schakelaar, meldingskanalen (lokaal/e-mail/Telegram), optioneel app-pakketfilter, optionele
   scherm-herkenningstekst en een afkoelperiode in minuten. "Bevat NIET"-regels vereisen een
   specifiek app-pakket. Een trefwoord mag eenvoudige jokertekens bevatten: `*` voor een
   willekeurige reeks tekens (ook geen) en `?` voor precies één teken — bijvoorbeeld `koop*bitcoin`
@@ -221,12 +267,18 @@ herbouwwerkzaamheden.
   logregel kunnen niet langer stilletjes worden afgebroken doordat het scherm tijdens het versturen
   van de e-mail (tot 15 seconden) opnieuw wijzigt. Als het versturen van een e-mail toch mislukt
   (bijv. door een fout van Mailjet), toont het meldingenlog voortaan de exacte foutmelding bij die
-  logregel, in plaats van alleen "geen e-mail" te tonen zonder reden.
+  logregel, in plaats van alleen "geen e-mail" te tonen zonder reden. Hetzelfde geldt voor Telegram.
+- **Fallback-controle elke 60 seconden**: naast de normale controle bij elke schermwijziging
+  (via Toegankelijkheidsservice-events) wordt elke regel ook sowieso elke 60 seconden opnieuw
+  gecontroleerd. Dit vangt gevallen op waarin een app zijn scherm bijwerkt zonder dat Android
+  daarbij een accessibility-event afvuurt (bijv. custom-drawn views, of het scherm staat uit),
+  zodat een RESOLVED-melding niet onnodig lang op zich laat wachten.
 - **Meldingenlog**: chronologisch overzicht van ISSUE/RESOLVED-gebeurtenissen, met tijdstip, app,
-  tekstfragment en (bij een mislukte e-mail) de foutmelding.
-- **E-mail instellingen**: Mailjet-configuratie (API Key/Secret Key, afzender, ontvanger) met
-  testknop. E-mail wordt verstuurd via HTTPS naar de Mailjet Send API, niet via SMTP. Instellingen
-  kunnen via een kopieerbare code worden overgezet naar andere apparaten.
+  tekstfragment en (bij een mislukte e-mail of Telegram-bericht) de foutmelding.
+- **Meldingen-instellingen**: Mailjet-configuratie (API Key/Secret Key, afzender, ontvanger) en
+  Telegram-configuratie (bot-token, chat-ID), elk met eigen testknop. E-mail wordt verstuurd via
+  HTTPS naar de Mailjet Send API, niet via SMTP; Telegram-berichten via de Telegram Bot API.
+  Beide instellingensets kunnen via een kopieerbare code worden overgezet naar andere apparaten.
 - **Apparaatgegevens in de e-mail**: elke alert-e-mail begint met apparaatnaam (merk/model),
   een apparaat-ID en het lokale IP-adres van het toestel. Android staat reguliere apps sinds
   Android 10 niet meer toe om het echte hardware-serienummer op te vragen (dat is voorbehouden aan

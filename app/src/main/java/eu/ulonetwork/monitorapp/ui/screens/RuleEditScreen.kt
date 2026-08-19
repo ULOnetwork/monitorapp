@@ -56,6 +56,7 @@ fun RuleEditScreen(ruleId: Long, onDone: () -> Unit) {
     var enabled by remember { mutableStateOf(true) }
     var notifyLocal by remember { mutableStateOf(true) }
     var notifyEmail by remember { mutableStateOf(false) }
+    var notifyTelegram by remember { mutableStateOf(false) }
     var appPackageFilter by remember { mutableStateOf("") }
     var screenGateKeyword by remember { mutableStateOf("") }
     var cooldownMinutes by remember { mutableStateOf("10") }
@@ -73,6 +74,7 @@ fun RuleEditScreen(ruleId: Long, onDone: () -> Unit) {
                 enabled = rule.enabled
                 notifyLocal = rule.notifyLocal
                 notifyEmail = rule.notifyEmail
+                notifyTelegram = rule.notifyTelegram
                 appPackageFilter = rule.appPackageFilter ?: ""
                 screenGateKeyword = rule.screenGateKeyword ?: ""
                 cooldownMinutes = rule.cooldownMinutes.toString()
@@ -179,6 +181,7 @@ fun RuleEditScreen(ruleId: Long, onDone: () -> Unit) {
         SwitchRow(label = stringResource(R.string.rule_case_sensitive), checked = caseSensitive, onCheckedChange = { caseSensitive = it })
         SwitchRow(label = stringResource(R.string.rule_notify_local), checked = notifyLocal, onCheckedChange = { notifyLocal = it })
         SwitchRow(label = stringResource(R.string.rule_notify_email), checked = notifyEmail, onCheckedChange = { notifyEmail = it })
+        SwitchRow(label = stringResource(R.string.rule_notify_telegram), checked = notifyTelegram, onCheckedChange = { notifyTelegram = it })
 
         if (showValidationError) {
             Spacer(modifier = Modifier.height(8.dp))
@@ -224,6 +227,7 @@ fun RuleEditScreen(ruleId: Long, onDone: () -> Unit) {
                         enabled = enabled,
                         notifyLocal = notifyLocal,
                         notifyEmail = notifyEmail,
+                        notifyTelegram = notifyTelegram,
                         appPackageFilter = trimmedFilter,
                         screenGateKeyword = trimmedScreenGate,
                         cooldownMinutes = cooldownMinutes.toIntOrNull() ?: 10,

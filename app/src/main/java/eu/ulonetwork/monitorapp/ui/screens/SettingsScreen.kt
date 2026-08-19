@@ -48,7 +48,10 @@ import eu.ulonetwork.monitorapp.R
 import eu.ulonetwork.monitorapp.data.MailjetSettings
 import eu.ulonetwork.monitorapp.data.MailjetSettingsCodec
 import eu.ulonetwork.monitorapp.data.PreferencesManager
+import eu.ulonetwork.monitorapp.data.TelegramSettings
+import eu.ulonetwork.monitorapp.data.TelegramSettingsCodec
 import eu.ulonetwork.monitorapp.mail.MailjetMailSender
+import eu.ulonetwork.monitorapp.telegram.TelegramSender
 import kotlinx.coroutines.launch
 
 /**
@@ -68,9 +71,12 @@ private const val LANGUAGE_PICKER_ENABLED = false
  */
 private const val EXPORT_FILE_NAME = "mailjet-export.txt"
 
-private fun writeExportFile(context: Context, exportCode: String) {
+/** Same rationale as [EXPORT_FILE_NAME], for the Telegram settings export below. */
+private const val TELEGRAM_EXPORT_FILE_NAME = "telegram-export.txt"
+
+private fun writeExportFile(context: Context, fileName: String, exportCode: String) {
     try {
-        context.openFileOutput(EXPORT_FILE_NAME, Context.MODE_PRIVATE).use {
+        context.openFileOutput(fileName, Context.MODE_PRIVATE).use {
             it.write(exportCode.toByteArray(Charsets.UTF_8))
         }
     } catch (e: Exception) {
@@ -83,6 +89,7 @@ fun SettingsScreen() {
     val context = LocalContext.current
     val preferencesManager = remember { PreferencesManager(context) }
     val mailSender = remember { MailjetMailSender() }
+    val telegramSender = remember { TelegramSender() }
     val clipboardManager = LocalClipboardManager.current
     val scope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
@@ -96,6 +103,12 @@ fun SettingsScreen() {
     var exportCode by remember { mutableStateOf("") }
     var importInput by remember { mutableStateOf("") }
 
+    var telegramBotToken by remember { mutableStateOf("") }
+    var telegramChatId by remember { mutableStateOf("") }
+    var isSendingTelegramTest by remember { mutableStateOf(false) }
+    var telegramExportCode by remember { mutableStateOf("") }
+    var telegramImportInput by remember { mutableStateOf("") }
+
     LaunchedEffect(Unit) {
         val settings = preferencesManager.getMailjetSettings()
         apiKey = settings.apiKey
@@ -103,6 +116,10 @@ fun SettingsScreen() {
         fromAddress = settings.fromAddress
         fromName = settings.fromName
         toAddress = settings.toAddress
+
+        val telegramSettings = preferencesManager.getTelegramSettings()
+        telegramBotToken = telegramSettings.botToken
+        telegramChatId = telegramSettings.chatId
     }
 
     fun currentSettings(): MailjetSettings = MailjetSettings(
@@ -111,6 +128,11 @@ fun SettingsScreen() {
         fromAddress = fromAddress.trim(),
         fromName = fromName.trim(),
         toAddress = toAddress.trim()
+    )
+
+    fun currentTelegramSettings(): TelegramSettings = TelegramSettings(
+        botToken = telegramBotToken.trim(),
+        chatId = telegramChatId.trim()
     )
 
     Scaffold(
@@ -218,7 +240,7 @@ fun SettingsScreen() {
                 onClick = {
                     exportCode = MailjetSettingsCodec.encode(currentSettings())
                     clipboardManager.setText(AnnotatedString(exportCode))
-                    writeExportFile(context, exportCode)
+                    writeExportFile(context, EXPORT_FILE_NAME, exportCode)
                     scope.launch { snackbarHostState.showSnackbar(context.getString(R.string.settings_export_copied)) }
                 },
                 modifier = Modifier.fillMaxWidth()
@@ -264,6 +286,129 @@ fun SettingsScreen() {
                         fromName = decoded.fromName
                         toAddress = decoded.toAddress
                         importInput = ""
+                        scope.launch { snackbarHostState.showSnackbar(context.getString(R.string.settings_import_success)) }
+                    }
+                },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(stringResource(R.string.settings_import_button))
+            }
+
+            Spacer(modifier = Modifier.height(32.dp))
+            Text(text = stringResource(R.string.settings_telegram_title), style = MaterialTheme.typography.headlineSmall)
+            Spacer(modifier = Modifier.height(4.dp))
+            Text(text = stringResource(R.string.settings_telegram_explanation), style = MaterialTheme.typography.bodySmall)
+            Spacer(modifier = Modifier.height(16.dp))
+
+            OutlinedTextField(
+                value = telegramBotToken,
+                onValueChange = { telegramBotToken = it },
+                label = { Text(stringResource(R.string.settings_telegram_bot_token)) },
+                supportingText = { Text(stringResource(R.string.settings_telegram_bot_token_hint)) },
+                visualTransformation = PasswordVisualTransformation(),
+                modifier = Modifier.fillMaxWidth()
+            )
+            Spacer(modifier = Modifier.height(12.dp))
+            OutlinedTextField(
+                value = telegramChatId,
+                onValueChange = { telegramChatId = it },
+                label = { Text(stringResource(R.string.settings_telegram_chat_id)) },
+                supportingText = { Text(stringResource(R.string.settings_telegram_chat_id_hint)) },
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            Spacer(modifier = Modifier.height(24.dp))
+            Button(
+                onClick = {
+                    preferencesManager.saveTelegramSettings(currentTelegramSettings())
+                    scope.launch { snackbarHostState.showSnackbar(context.getString(R.string.settings_saved)) }
+                },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(stringResource(R.string.settings_save))
+            }
+
+            Spacer(modifier = Modifier.height(12.dp))
+            OutlinedButton(
+                onClick = {
+                    preferencesManager.saveTelegramSettings(currentTelegramSettings())
+                    isSendingTelegramTest = true
+                    scope.launch {
+                        val result = telegramSender.send(
+                            settings = currentTelegramSettings(),
+                            text = context.getString(R.string.settings_telegram_test_message)
+                        )
+                        isSendingTelegramTest = false
+                        val message = when (result) {
+                            is TelegramSender.Result.Success -> context.getString(R.string.settings_test_success)
+                            is TelegramSender.Result.Failure -> context.getString(R.string.settings_test_failure, result.message)
+                        }
+                        snackbarHostState.showSnackbar(message)
+                    }
+                },
+                enabled = !isSendingTelegramTest,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                if (isSendingTelegramTest) {
+                    CircularProgressIndicator(modifier = Modifier.height(20.dp))
+                } else {
+                    Text(stringResource(R.string.settings_telegram_test))
+                }
+            }
+
+            Spacer(modifier = Modifier.height(32.dp))
+            Text(text = stringResource(R.string.settings_transfer_title), style = MaterialTheme.typography.titleMedium)
+            Spacer(modifier = Modifier.height(4.dp))
+            Text(text = stringResource(R.string.settings_telegram_transfer_explanation), style = MaterialTheme.typography.bodySmall)
+
+            Spacer(modifier = Modifier.height(12.dp))
+            OutlinedButton(
+                onClick = {
+                    telegramExportCode = TelegramSettingsCodec.encode(currentTelegramSettings())
+                    clipboardManager.setText(AnnotatedString(telegramExportCode))
+                    writeExportFile(context, TELEGRAM_EXPORT_FILE_NAME, telegramExportCode)
+                    scope.launch { snackbarHostState.showSnackbar(context.getString(R.string.settings_export_copied)) }
+                },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(stringResource(R.string.settings_export_button))
+            }
+            if (telegramExportCode.isNotBlank()) {
+                Spacer(modifier = Modifier.height(8.dp))
+                OutlinedTextField(
+                    value = telegramExportCode,
+                    onValueChange = {},
+                    readOnly = true,
+                    label = { Text(stringResource(R.string.settings_export_label)) },
+                    supportingText = { Text(stringResource(R.string.settings_export_hint)) },
+                    modifier = Modifier.fillMaxWidth()
+                )
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(
+                    text = stringResource(R.string.settings_export_file_hint, TELEGRAM_EXPORT_FILE_NAME),
+                    style = MaterialTheme.typography.bodySmall
+                )
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+            OutlinedTextField(
+                value = telegramImportInput,
+                onValueChange = { telegramImportInput = it },
+                label = { Text(stringResource(R.string.settings_import_label)) },
+                placeholder = { Text(stringResource(R.string.settings_telegram_import_placeholder)) },
+                minLines = 2,
+                modifier = Modifier.fillMaxWidth()
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            OutlinedButton(
+                onClick = {
+                    val decoded = TelegramSettingsCodec.decode(telegramImportInput)
+                    if (decoded == null) {
+                        scope.launch { snackbarHostState.showSnackbar(context.getString(R.string.settings_import_invalid)) }
+                    } else {
+                        telegramBotToken = decoded.botToken
+                        telegramChatId = decoded.chatId
+                        telegramImportInput = ""
                         scope.launch { snackbarHostState.showSnackbar(context.getString(R.string.settings_import_success)) }
                     }
                 },

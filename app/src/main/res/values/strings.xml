@@ -6,7 +6,7 @@
     <string name="nav_status">Status</string>
     <string name="nav_rules">Keywords</string>
     <string name="nav_log">Alert log</string>
-    <string name="nav_settings">E-mail settings</string>
+    <string name="nav_settings">Notifications</string>
 
     <string name="consent_title">Before you continue</string>
     <string name="consent_body">UnetworkMonitor uses an Accessibility Service to read the text visible on screen, across all apps used on this device. This text is compared against a list of keywords that you configure yourself. On a match, the app can show a local notification and/or send an e-mail.\n\nOnly install and use this app on a device that you own yourself, or for which you have the explicit permission of the owner/user to monitor it. Reading screen text without the consent of the device\'s user may be in violation of privacy laws and regulations.\n\nThe app is always visible in the app list with its normal icon and normal name \"UnetworkMonitor\", and never hides itself.</string>
@@ -41,6 +41,7 @@
     <string name="rule_enabled">Enabled</string>
     <string name="rule_notify_local">Local notification</string>
     <string name="rule_notify_email">E-mail notification</string>
+    <string name="rule_notify_telegram">Telegram notification</string>
     <string name="rule_app_filter">App package filter (optional)</string>
     <string name="rule_app_filter_hint">e.g. com.whatsapp — empty = all apps</string>
     <string name="rule_screen_gate">Screen recognition text (optional)</string>
@@ -63,9 +64,11 @@
     <string name="log_channels_label">Channels: %1$s</string>
     <string name="log_channel_notification">notification</string>
     <string name="log_channel_email">e-mail</string>
+    <string name="log_channel_telegram">Telegram</string>
     <string name="log_channel_none">none</string>
     <string name="log_snippet_no_text">(No text detected on screen)</string>
     <string name="log_email_error">E-mail error: %1$s</string>
+    <string name="log_telegram_error">Telegram error: %1$s</string>
 
     <string name="settings_title">E-mail settings (Mailjet)</string>
     <string name="settings_explanation">E-mail alerts are sent via the Mailjet API over HTTPS (not SMTP), since SMTP ports are commonly blocked by network firewalls. See the README for how to create a Mailjet account and find these values.</string>
@@ -95,6 +98,17 @@
     <string name="settings_import_button">Import</string>
     <string name="settings_import_success">Settings imported — don\'t forget to tap Save</string>
     <string name="settings_import_invalid">This doesn\'t look like a valid settings code</string>
+
+    <string name="settings_telegram_title">Telegram settings</string>
+    <string name="settings_telegram_explanation">Telegram alerts are sent via a Telegram bot. 1) Message @BotFather on Telegram, send /newbot and follow the steps to get a bot token. 2) Send any message to your new bot, then open https://api.telegram.org/bot&lt;token&gt;/getUpdates in a browser (replace &lt;token&gt;) to find your chat ID in the response (\"chat\":{\"id\":…}). See the README for a step-by-step walkthrough.</string>
+    <string name="settings_telegram_bot_token">Bot token</string>
+    <string name="settings_telegram_bot_token_hint">From @BotFather after creating your bot — treat it like a password</string>
+    <string name="settings_telegram_chat_id">Chat ID</string>
+    <string name="settings_telegram_chat_id_hint">Your personal chat ID, or a group/channel ID if you want alerts sent there</string>
+    <string name="settings_telegram_test">Send test message</string>
+    <string name="settings_telegram_test_message">This is a test message from the UnetworkMonitor app. If you receive this, your Telegram settings are working correctly.</string>
+    <string name="settings_telegram_transfer_explanation">Generate a code below to copy this Telegram configuration to another device, or paste a code generated on another device to import it here. The code contains your bot token in decodable form, so treat it like a password.</string>
+    <string name="settings_telegram_import_placeholder">UMTG1:…</string>
 
     <string name="settings_language_section">Language / Taal</string>
     <string name="language_option_english">English</string>

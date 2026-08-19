@@ -17,6 +17,7 @@ data class KeywordRule(
     val enabled: Boolean = true,
     val notifyLocal: Boolean = true,
     val notifyEmail: Boolean = false,
+    val notifyTelegram: Boolean = false,
     /** Package name this rule is limited to, or null to apply to every app. */
     val appPackageFilter: String? = null,
     /**

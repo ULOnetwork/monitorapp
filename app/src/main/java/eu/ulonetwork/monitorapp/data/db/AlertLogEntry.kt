@@ -18,7 +18,10 @@ data class AlertLogEntry(
     val textSnippet: String,
     val notifiedLocal: Boolean,
     val notifiedEmail: Boolean,
+    val notifiedTelegram: Boolean = false,
     val eventType: AlertEventType,
     /** Failure message from [eu.ulonetwork.monitorapp.mail.MailjetMailSender], or null if e-mail wasn't attempted or succeeded. */
-    val emailError: String? = null
+    val emailError: String? = null,
+    /** Failure message from [eu.ulonetwork.monitorapp.telegram.TelegramSender], or null if Telegram wasn't attempted or succeeded. */
+    val telegramError: String? = null
 )
