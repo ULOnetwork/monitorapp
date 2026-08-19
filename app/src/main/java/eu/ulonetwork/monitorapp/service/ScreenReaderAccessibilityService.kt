@@ -20,6 +20,12 @@ import kotlinx.coroutines.launch
  *
  * Text extraction is debounced by [DEBOUNCE_MILLIS] so that rapid successive events (e.g. while
  * scrolling or typing) only trigger a single evaluation pass.
+ *
+ * Evaluation is primarily triggered by accessibility events, but some apps update their screen
+ * without dispatching a window-state/content-changed event (e.g. custom-drawn views, or updates
+ * while the screen is off), which would otherwise leave a stale ISSUE/RESOLVED state undetected
+ * indefinitely. [pollRunnable] re-evaluates every [POLL_INTERVAL_MILLIS] regardless of events as
+ * a fallback safety net.
  */
 class ScreenReaderAccessibilityService : AccessibilityService() {
 
@@ -30,9 +36,17 @@ class ScreenReaderAccessibilityService : AccessibilityService() {
 
     private lateinit var ruleEvaluator: RuleEvaluator
 
+    private val pollRunnable = object : Runnable {
+        override fun run() {
+            scheduleEvaluation(null)
+            mainHandler.postDelayed(this, POLL_INTERVAL_MILLIS)
+        }
+    }
+
     override fun onServiceConnected() {
         super.onServiceConnected()
         ruleEvaluator = RuleEvaluator(applicationContext)
+        mainHandler.postDelayed(pollRunnable, POLL_INTERVAL_MILLIS)
         Log.i(TAG, "ScreenReaderAccessibilityService verbonden")
     }
 
@@ -114,11 +128,13 @@ class ScreenReaderAccessibilityService : AccessibilityService() {
     override fun onDestroy() {
         super.onDestroy()
         pendingEvaluation?.let { mainHandler.removeCallbacks(it) }
+        mainHandler.removeCallbacks(pollRunnable)
         serviceScope.cancel()
     }
 
     companion object {
         private const val TAG = "ScreenReaderService"
         private const val DEBOUNCE_MILLIS = 800L
+        private const val POLL_INTERVAL_MILLIS = 60_000L
     }
 }
