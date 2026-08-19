@@ -132,4 +132,7 @@
     <string name="alert_email_app_label">App: %1$s</string>
     <string name="alert_email_time_label">Tijdstip: %1$s</string>
     <string name="alert_email_fragment_label">Fragment:</string>
+
+    <string name="alert_telegram_header_issue">🔴 PROBLEEM — %1$s</string>
+    <string name="alert_telegram_header_resolved">✅ OPGELOST — %1$s</string>
 </resources>

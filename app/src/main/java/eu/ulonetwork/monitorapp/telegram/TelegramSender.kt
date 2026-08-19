@@ -18,9 +18,15 @@ import javax.net.ssl.HttpsURLConnection
  * [HttpsURLConnection] and [org.json] only — same approach as [eu.ulonetwork.monitorapp.mail.MailjetMailSender],
  * no extra HTTP client dependency.
  *
- * The message is sent without a `parse_mode`, i.e. as plain text: on-screen text snippets can
- * contain characters that are meaningful in Telegram's Markdown/HTML modes (e.g. `*`, `_`, `<`),
- * and a parse error there would silently break delivery of the alert itself.
+ * Messages are sent with Telegram's `HTML` parse mode so callers can bold the ISSUE/RESOLVED
+ * status (Telegram has no separate subject line like e-mail does, so without this the event type
+ * would only be visible by reading into the message body). HTML mode is used rather than
+ * Markdown/MarkdownV2 because it needs escaping only three characters (`&`, `<`, `>`, via
+ * [escapeHtml]) instead of MarkdownV2's much longer list of reserved punctuation — important here
+ * since on-screen text snippets are arbitrary and unescaped user/app content would otherwise risk
+ * a parse error that silently breaks delivery of the alert itself. Callers MUST run any dynamic
+ * text through [escapeHtml] before including it in the message, and MUST NOT feed pre-formed HTML
+ * tags into [send] via dynamic content.
  *
  * All network I/O runs on [Dispatchers.IO].
  */
@@ -51,6 +57,7 @@ class TelegramSender {
                 val requestBody = JSONObject().apply {
                     put("chat_id", settings.chatId)
                     put("text", text)
+                    put("parse_mode", "HTML")
                 }.toString()
                 connection.outputStream.use { it.write(requestBody.toByteArray(StandardCharsets.UTF_8)) }
 
@@ -99,5 +106,13 @@ class TelegramSender {
         private const val TAG = "TelegramSender"
         private const val SEND_ENDPOINT_TEMPLATE = "https://api.telegram.org/bot%s/sendMessage"
         private const val TIMEOUT_MS = 15000
+
+        /** Escapes the three characters significant to Telegram's `HTML` parse mode. */
+        fun escapeHtml(text: String): String {
+            return text
+                .replace("&", "&amp;")
+                .replace("<", "&lt;")
+                .replace(">", "&gt;")
+        }
     }
 }

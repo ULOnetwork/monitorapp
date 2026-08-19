@@ -256,6 +256,14 @@ class RuleEvaluator(private val context: Context) {
         }
     }
 
+    /**
+     * Builds the Telegram message body in [TelegramSender]'s `HTML` parse mode. Telegram has no
+     * separate subject line the way e-mail does, so the ISSUE/RESOLVED status is made visible by
+     * bolding it as the first line instead — otherwise it would only show up by reading into the
+     * message body. Every dynamic value is run through [TelegramSender.escapeHtml] since on-screen
+     * text (the keyword, app package, or snippet) is arbitrary and could otherwise break HTML
+     * parsing or inject unintended formatting.
+     */
     private fun buildTelegramMessage(
         rule: KeywordRule,
         appPackage: String,
@@ -264,23 +272,31 @@ class RuleEvaluator(private val context: Context) {
         eventType: AlertEventType
     ): String {
         val formatter = SimpleDateFormat("dd-MM-yyyy HH:mm:ss", Locale.getDefault())
+        val headerRes = if (eventType == AlertEventType.RESOLVED) {
+            R.string.alert_telegram_header_resolved
+        } else {
+            R.string.alert_telegram_header_issue
+        }
         val introRes = if (eventType == AlertEventType.RESOLVED) {
             R.string.alert_email_intro_resolved
         } else {
             R.string.alert_email_intro_issue
         }
+
+        fun esc(text: String) = TelegramSender.escapeHtml(text)
+
         return buildString {
-            appendLine(context.getString(R.string.alert_email_device_name_label, DeviceInfoProvider.deviceName()))
-            appendLine(context.getString(R.string.alert_email_ip_label, DeviceInfoProvider.localIpAddress()))
+            appendLine("<b>" + context.getString(headerRes, esc(rule.keyword)) + "</b>")
             appendLine()
             appendLine(context.getString(introRes))
             appendLine()
-            appendLine(context.getString(R.string.alert_email_keyword_label, rule.keyword))
-            appendLine(context.getString(R.string.alert_email_app_label, appPackage))
+            appendLine(context.getString(R.string.alert_email_device_name_label, esc(DeviceInfoProvider.deviceName())))
+            appendLine(context.getString(R.string.alert_email_ip_label, esc(DeviceInfoProvider.localIpAddress())))
+            appendLine(context.getString(R.string.alert_email_app_label, esc(appPackage)))
             appendLine(context.getString(R.string.alert_email_time_label, formatter.format(Date(timestamp))))
             appendLine()
             appendLine(context.getString(R.string.alert_email_fragment_label))
-            appendLine(snippet)
+            appendLine(esc(snippet))
         }
     }
 
